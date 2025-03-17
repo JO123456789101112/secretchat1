@@ -265,13 +265,6 @@ function copyText(text) {
             const itemInput = document.getElementById('item');
             const itemName = itemInput.value;
             // عند الضغط على Enter، يتم إرسال البيانات
-            document.getElementById("item").addEventListener("keypress", function(event) {
-                if (event.key === "Enter") {
-                    event.preventDefault(); // منع إعادة تحميل الصفحة
-                   addItem(); // استدعاء دالة الإضافة
-    }
-});
-
             if (itemName) {
                 fetch('/wishlist', {
                     method: 'POST',
@@ -287,6 +280,14 @@ function copyText(text) {
                 });
             }
         }
+
+        // عند الضغط على Enter، يتم إرسال البيانات
+document.getElementById("item").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // منع إعادة تحميل الصفحة
+        addItem(); // استدعاء دالة الإضافة
+    }
+});
 
         // Delete an item from the wishlist
         function deleteItem(itemId) {
