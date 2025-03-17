@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My chat💭</title>
+    <style>
+        /* General page styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b); /* Beautiful gradient background */
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #wishlist {
+    max-height: 400px; /* أو أي ارتفاع يناسبك */
+    overflow-y: auto; /* يجعل القائمة قابلة للتمرير */
+    border: 2px solid white; /* لتحسين الشكل */
+    padding: 10px;
+}
+        h1 {
+            color: #fff;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Soft shadow */
+        }
+
+        /* Input and Button Styles */
+        .input-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            width: 90%;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            border: 2px solid #ff7e5f;
+            width: 100%;
+            max-width: 280px; /* Limits the input field width on small screens */
+            margin-right: 10px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        input[type="text"]:focus {
+            border-color: #feb47b;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 126, 95, 0.6); /* Glow effect */
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            background-color: #feb47b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            width: 100%;
+            max-width: 200px; /* Limits the button width on small screens */
+        }
+
+        button:hover {
+            background-color: #ff7e5f;
+            transform: scale(1.1);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Wishlist styles */
+        h2 {
+            color: #fff;
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        li {
+            background-color: #fff;
+            color: #333;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-10px);
+            opacity: 0;
+            animation: slideIn 0.5s forwards;
+        }
+
+        li button {
+            background-color: #ff7e5f;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        li button:hover {
+            background-color: #feb47b;
+            transform: scale(1.1);
+        }
+
+        li button:active {
+            transform: scale(0.98);
+        }
+
+        /* Animation */
+        @keyframes slideIn {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Media Queries for smaller screens (mobile-friendly) */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+
+            .input-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            input[type="text"], button {
+                width: 90%;  /* Makes both input and button take up most of the screen */
+                max-width: 350px;
+            }
+
+            ul {
+                width: 90%;
+                max-width: 400px;
+            }
+
+            li {
+                font-size: 1.2rem;
+                padding: 12px;
+            }
+
+            li button {
+                font-size: 1rem;
+                padding: 8px 14px;
+            }
+        }
+
+        /* Mobile Specific Adjustments for very small screens */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .input-container input[type="text"], .input-container button {
+                padding: 12px;
+                font-size: 1rem;
+                max-width: 80%;
+            }
+
+            li {
+                font-size: 1.1rem;
+                padding: 10px;
+            }
+
+
+
+        }
+    </style>
+</head>
+<body>
+
+    <h1>john secret chat💭</h1>
+
+    <div class="input-container">
+        <input type="text" id="item" placeholder="Aktb Hna 🤫">
+        <button onclick="addItem()">Add to chat 🔊</button>
+    </div>
+
+    <h2>Chat 📨:</h2>
+    <ul id="wishlist">
+        <!-- Wishlist items will be populated here -->
+    </ul>
+
+    <script>
+        // Fetch and display wishlist items from the server
+        window.onload = function() {
+            fetchWishlist();
+        };
+
+        
+        function fetchWishlist() {
+    fetch('/wishlist')
+        .then(response => response.json())
+        .then(data => {
+            const wishlist = document.getElementById('wishlist');
+            wishlist.innerHTML = ''; // Clear current list
+            data.forEach(item => {
+                const li = document.createElement('li');
+
+                // النص الرئيسي
+                const textSpan = document.createElement('span');
+                textSpan.textContent = item.name;
+
+                // زر النسخ
+                const copyButton = document.createElement('button');
+                copyButton.textContent = '📋';
+                copyButton.onclick = () => copyText(item.name);
+
+                // زر الحذف
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '❌';
+                deleteButton.onclick = () => deleteItem(item._id);
+
+                // إضافة العناصر إلى القائمة
+                li.appendChild(textSpan);
+                li.appendChild(copyButton);
+                li.appendChild(deleteButton);
+                wishlist.appendChild(li);
+            });
+        });
+}
+
+// وظيفة لنسخ النص
+function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+
+    }).catch(err => {
+        console.error('فشل النسخ', err);
+    });
+}
+       
+
+        // Add an item to the wishlist
+        function addItem() {
+            const itemInput = document.getElementById('item');
+            const itemName = itemInput.value;
+            if (itemName) {
+                fetch('/wishlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: itemName })
+                })
+                .then(response => response.json())
+                .then(() => {
+                    itemInput.value = ''; // Clear input after adding
+                    fetchWishlist(); // Refresh the wishlist
+                });
+            }
+        }
+
+        // Delete an item from the wishlist
+        function deleteItem(itemId) {
+            fetch(`/wishlist/${itemId}`, {
+                method: 'DELETE',
+            })
+            .then(() => {
+                fetchWishlist(); // Refresh the wishlist after deletion
+            })
+            .catch(err => console.error('Error deleting item:', err));
+        }
+    </script>
+
+</body>
+</html>
