@@ -2,187 +2,174 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- Ensure proper scaling on mobile -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My chat💭</title>
   <style>
-    /* General page styles */
+    /* Reset & Global */
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #ff7e5f, #feb47b);
-      color: #333;
       margin: 0;
       padding: 0;
+      background: #e5e5e5;
       display: flex;
       flex-direction: column;
-      align-items: center;
       height: 100vh;
-      overflow: hidden;
     }
-    h1 {
+    /* Fixed header */
+    header {
+      background-color: #4a90e2;
       color: #fff;
       text-align: center;
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-    .input-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 90%;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    input[type="text"] {
       padding: 15px;
-      font-size: 1.1rem;
-      border: 2px solid #ff7e5f;
-      border-radius: 10px;
+      font-size: 1.8rem;
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      max-width: 280px;
-      transition: all 0.3s ease-in-out;
+      z-index: 10;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    input[type="text"]::placeholder {
-      color: rgba(0, 0, 0, 0.5);
-    }
-    input[type="text"]:focus {
-      border-color: #feb47b;
-      outline: none;
-      box-shadow: 0 0 10px rgba(255, 126, 95, 0.6);
-    }
-    button {
-      padding: 15px 30px;
-      font-size: 1.1rem;
-      background-color: #feb47b;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease-in-out;
-      width: 100%;
-      max-width: 200px;
-    }
-    button:hover {
-      background-color: #ff7e5f;
-      transform: scale(1.1);
-    }
-    button:active {
-      transform: scale(0.98);
-    }
-    h2 {
-      color: #fff;
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-    #wishlist {
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
+    /* Chat area container (fills space between header and input) */
+    .chat-area {
+      flex: 1;
+      margin-top: 60px; /* header height */
+      margin-bottom: 70px; /* input container height */
       padding: 10px;
-      border: 2px solid white;
-      max-height: 400px;
       overflow-y: auto;
+      background: #f2f2f2;
     }
-    ul {
+    /* Chat header title hidden in new design (but h2 preserved for functionality) */
+    h2 {
+      display: none;
+    }
+    /* Chat list styles (chat bubbles) */
+    #wishlistList {
       list-style: none;
-      padding-left: 0;
+      padding: 0;
       margin: 0;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-    li {
+    #wishlistList li {
       background-color: #fff;
-      color: #333;
-      padding: 15px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      animation: slideIn 0.5s forwards;
+      padding: 12px 15px;
+      border-radius: 20px;
+      max-width: 80%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+      animation: slideIn 0.3s forwards;
     }
-    li button {
-      background-color: #ff7e5f;
-      color: white;
-      padding: 8px 16px;
+    /* For demo, all messages align left (you could later alternate for sender/receiver) */
+    #wishlistList li span {
+      word-wrap: break-word;
+    }
+    /* Action buttons on chat bubble */
+    #wishlistList li button {
+      background-color: transparent;
       border: none;
-      border-radius: 5px;
+      font-size: 1.2rem;
+      margin-left: 8px;
       cursor: pointer;
-      transition: all 0.3s ease-in-out;
-      margin-left: 5px;
     }
-    li button:hover {
-      background-color: #feb47b;
-      transform: scale(1.1);
+    #wishlistList li button:hover {
+      opacity: 0.7;
     }
-    li button:active {
+    /* Fixed input container at the bottom */
+    .input-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #fff;
+      padding: 10px 15px;
+      display: flex;
+      gap: 10px;
+      box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+    .input-container input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      transition: border-color 0.3s ease;
+    }
+    .input-container input[type="text"]::placeholder {
+      color: #999;
+    }
+    .input-container input[type="text"]:focus {
+      border-color: #4a90e2;
+      outline: none;
+    }
+    .input-container button {
+      background-color: #4a90e2;
+      color: #fff;
+      padding: 12px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .input-container button:hover {
+      background-color: #3d7bbf;
+      transform: scale(1.05);
+    }
+    .input-container button:active {
       transform: scale(0.98);
     }
+    /* Loading indicator styling inside chat area */
+    .loading {
+      text-align: center;
+      color: #555;
+      font-size: 1rem;
+      margin-top: 20px;
+    }
+    /* Chat bubble slide in animation */
     @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-10px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 2rem;
-      }
-      input[type="text"],
-      button {
-        max-width: 350px;
-      }
-      ul {
-        max-width: 400px;
-      }
-      li {
-        font-size: 1.2rem;
-        padding: 12px;
-      }
-      li button {
-        font-size: 1rem;
-        padding: 8px 14px;
-      }
-    }
+    /* Responsive adjustments for smaller mobile screens */
     @media (max-width: 480px) {
-      h1 {
-        font-size: 1.8rem;
+      header {
+        font-size: 1.5rem;
+        padding: 10px;
       }
       .input-container input[type="text"],
       .input-container button {
-        padding: 12px;
-        font-size: 1rem;
-        max-width: 80%;
-      }
-      li {
-        font-size: 1.1rem;
         padding: 10px;
+        font-size: 0.9rem;
       }
-    }
-    /* Loading indicator styling */
-    .loading {
-      text-align: center;
-      color: #fff;
-      font-size: 1.2rem;
-      margin-top: 20px;
+      #wishlistList li {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Fixed header -->
+  <header>john secret chat💭</header>
 
-  <h1>john secret chat💭</h1>
-
-  <div class="input-container">
-    <input type="text" id="item" placeholder="Type your message...">
-    <button id="addButton">Add to chat 🔊</button>
-  </div>
-
-  <h2>Chat 📨:</h2>
-  <div id="wishlist">
+  <!-- Chat area -->
+  <div class="chat-area" id="wishlist">
     <div id="loading" class="loading">Loading...</div>
     <ul id="wishlistList">
       <!-- Chat items will appear here -->
     </ul>
+  </div>
+
+  <!-- Fixed input container -->
+  <div class="input-container">
+    <input type="text" id="item" placeholder="Type your message...">
+    <button id="addButton">Send</button>
   </div>
 
   <script>
