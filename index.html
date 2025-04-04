@@ -1,13 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Disable zooming on mobile -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>My chat💭</title>
   <style>
-    /* Global Reset & Styles */
-    * { box-sizing: border-box; }
+    /* Reset & Global */
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -31,18 +33,20 @@
       z-index: 10;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    /* Chat area container */
+    /* Chat area container (fills space between header and input) */
     .chat-area {
       flex: 1;
-      margin-top: 60px; /* height of header */
-      margin-bottom: 100px; /* space for input + typing indicator */
+      margin-top: 60px; /* header height */
+      margin-bottom: 70px; /* input container height */
       padding: 10px;
       overflow-y: auto;
       background: #f2f2f2;
     }
-    /* Hide secondary header text */
-    h2 { display: none; }
-    /* Chat list (chat bubbles) */
+    /* Chat header title hidden in new design (but h2 preserved for functionality) */
+    h2 {
+      display: none;
+    }
+    /* Chat list styles (chat bubbles) */
     #wishlistList {
       list-style: none;
       padding: 0;
@@ -57,10 +61,14 @@
       border-radius: 20px;
       max-width: 80%;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      animation: slideIn 0.3s forwards;
       position: relative;
+      animation: slideIn 0.3s forwards;
     }
-    #wishlistList li span { word-wrap: break-word; }
+    /* For demo, all messages align left (you could later alternate for sender/receiver) */
+    #wishlistList li span {
+      word-wrap: break-word;
+    }
+    /* Action buttons on chat bubble */
     #wishlistList li button {
       background-color: transparent;
       border: none;
@@ -68,11 +76,13 @@
       margin-left: 8px;
       cursor: pointer;
     }
-    #wishlistList li button:hover { opacity: 0.7; }
-    /* Fixed input container */
+    #wishlistList li button:hover {
+      opacity: 0.7;
+    }
+    /* Fixed input container at the bottom */
     .input-container {
       position: fixed;
-      bottom: 40px; /* leave space for typing indicator */
+      bottom: 0;
       left: 0;
       width: 100%;
       background: #fff;
@@ -90,7 +100,9 @@
       border-radius: 20px;
       transition: border-color 0.3s ease;
     }
-    .input-container input[type="text"]::placeholder { color: #999; }
+    .input-container input[type="text"]::placeholder {
+      color: #999;
+    }
     .input-container input[type="text"]:focus {
       border-color: #4a90e2;
       outline: none;
@@ -105,22 +117,12 @@
       cursor: pointer;
       transition: background 0.3s ease, transform 0.3s ease;
     }
-    .input-container button:hover { background-color: #3d7bbf; transform: scale(1.05); }
-    .input-container button:active { transform: scale(0.98); }
-    /* Typing indicator styling */
-    .typing-indicator {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: #fff;
-      padding: 5px 15px;
-      text-align: left;
-      font-size: 0.9rem;
-      color: #666;
-      box-shadow: 0 -2px 4px rgba(0,0,0,0.15);
-      z-index: 10;
-      display: none;
+    .input-container button:hover {
+      background-color: #3d7bbf;
+      transform: scale(1.05);
+    }
+    .input-container button:active {
+      transform: scale(0.98);
     }
     /* Loading indicator styling inside chat area */
     .loading {
@@ -129,17 +131,26 @@
       font-size: 1rem;
       margin-top: 20px;
     }
-    /* Slide in animation for chat bubbles */
+    /* Chat bubble slide in animation */
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    /* Responsive adjustments for mobile screens */
+    /* Responsive adjustments for smaller mobile screens */
     @media (max-width: 480px) {
-      header { font-size: 1.5rem; padding: 10px; }
+      header {
+        font-size: 1.5rem;
+        padding: 10px;
+      }
       .input-container input[type="text"],
-      .input-container button { padding: 10px; font-size: 0.9rem; }
-      #wishlistList li { font-size: 0.95rem; padding: 10px 12px; }
+      .input-container button {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      #wishlistList li {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+      }
     }
   </style>
 </head>
@@ -161,41 +172,8 @@
     <button id="addButton">Send</button>
   </div>
 
-  <!-- Typing indicator -->
-  <div class="typing-indicator" id="typingIndicator">Someone is typing...</div>
-
-  <!-- Include Socket.io -->
-  <script src="/socket.io/socket.io.js"></script>
   <script>
-    // Initialize Socket.io
-    const socket = io();
-
-    // Emit typing event when user types in the input
-    const itemInput = document.getElementById('item');
-    let typingTimeout;
-    itemInput.addEventListener('input', () => {
-      socket.emit('typing', { user: 'You' }); // Here, replace 'You' with dynamic username if available
-      clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        socket.emit('stopTyping');
-      }, 1000);
-    });
-
-    // Listen for typing events from other users
-    socket.on('displayTyping', data => {
-      const indicator = document.getElementById('typingIndicator');
-      if (data && data.user) {
-        indicator.textContent = data.user + ' is typing...';
-        indicator.style.display = 'block';
-      }
-    });
-
-    // Listen for stop typing event
-    socket.on('hideTyping', () => {
-      document.getElementById('typingIndicator').style.display = 'none';
-    });
-
-    // Existing code remains unchanged
+    // Helper function to safely create list items
     function createListItem(item) {
       const li = document.createElement('li');
 
@@ -250,7 +228,9 @@
         try {
           const response = await fetch('/wishlist', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ name: itemName })
           });
           if (!response.ok) {
@@ -258,7 +238,6 @@
           }
           itemInput.value = '';
           await fetchWishlist();
-          socket.emit('stopTyping');
         } catch (error) {
           console.error('Error adding message:', error);
           alert('Error adding message.');
