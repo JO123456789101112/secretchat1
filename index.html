@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>My chat💭</title>
   <style>
     /* Reset & Global */
@@ -61,20 +61,20 @@
       z-index: 10;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    /* Chat area container (fills space between header and input) */
+    /* Chat area container */
     .chat-area {
       flex: 1;
-      margin-top: 60px; /* header height */
-      margin-bottom: 70px; /* input container height */
+      margin-top: 60px;
+      margin-bottom: 70px;
       padding: 10px;
       overflow-y: auto;
       background: #f2f2f2;
     }
-    /* Chat header title hidden in new design (but h2 preserved for functionality) */
+    /* Chat header title hidden */
     h2 {
       display: none;
     }
-    /* Chat list styles (chat bubbles) */
+    /* Chat list styles */
     #wishlistList {
       list-style: none;
       padding: 0;
@@ -92,7 +92,6 @@
       position: relative;
       animation: slideIn 0.3s forwards;
     }
-    /* For demo, all messages align left (you could later alternate for sender/receiver) */
     #wishlistList li span {
       word-wrap: break-word;
       display: block;
@@ -105,7 +104,7 @@
       color: #666;
       text-align: right;
     }
-    /* Action buttons on chat bubble */
+    /* Action buttons */
     #wishlistList li button {
       background-color: transparent;
       border: none;
@@ -116,7 +115,7 @@
     #wishlistList li button:hover {
       opacity: 0.7;
     }
-    /* Fixed input container at the bottom */
+    /* Input container */
     .input-container {
       position: fixed;
       bottom: 0;
@@ -161,19 +160,19 @@
     .input-container button:active {
       transform: scale(0.98);
     }
-    /* Loading indicator styling inside chat area */
+    /* Loading indicator */
     .loading {
       text-align: center;
       color: #555;
       font-size: 1rem;
       margin-top: 20px;
     }
-    /* Chat bubble slide in animation */
+    /* Animations */
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    /* Responsive adjustments for smaller mobile screens */
+    /* Responsive adjustments */
     @media (max-width: 480px) {
       header {
         font-size: 1.5rem;
@@ -206,7 +205,7 @@
   <div class="real-time-clock" id="realTimeClock"></div>
   
   <!-- Online users counter -->
-  <div class="online-users" id="onlineUsers">Online: 1</div>
+  <div class="online-users" id="onlineUsers">Online: Loading...</div>
   
   <!-- Fixed header -->
   <header>john secret chat💭</header>
@@ -229,10 +228,10 @@
     // Helper function to format date
     function formatDate(dateString) {
       const date = new Date(dateString);
-      return date.toLocaleString(); // Adjust format as needed
+      return date.toLocaleString();
     }
 
-    // Helper function to safely create list items
+    // Helper function to create list items
     function createListItem(item) {
       const li = document.createElement('li');
 
@@ -266,17 +265,13 @@
       loadingIndicator.style.display = 'block';
       try {
         const response = await fetch('/wishlist');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        wishlistList.innerHTML = ''; // Clear current list
+        wishlistList.innerHTML = '';
         if (data.length === 0) {
           wishlistList.innerHTML = '<li>No messages yet.</li>';
         } else {
-          data.forEach(item => {
-            wishlistList.appendChild(createListItem(item));
-          });
+          data.forEach(item => wishlistList.appendChild(createListItem(item)));
         }
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -298,12 +293,10 @@
             },
             body: JSON.stringify({ 
               name: itemName,
-              createdAt: new Date().toISOString() // Add current timestamp
+              createdAt: new Date().toISOString()
             })
           });
-          if (!response.ok) {
-            throw new Error('Failed to add message.');
-          }
+          if (!response.ok) throw new Error('Failed to add message.');
           itemInput.value = '';
           await fetchWishlist();
         } catch (error) {
@@ -318,9 +311,7 @@
         const response = await fetch(`/wishlist/${itemId}`, {
           method: 'DELETE'
         });
-        if (!response.ok) {
-          throw new Error('Failed to delete message.');
-        }
+        if (!response.ok) throw new Error('Failed to delete message.');
         await fetchWishlist();
       } catch (error) {
         console.error('Error deleting message:', error);
@@ -342,28 +333,57 @@
       document.getElementById('realTimeClock').textContent = `${hours}:${minutes}:${seconds}`;
     }
 
-    // Online users functionality (simulated for demo)
-    let onlineCount = 1;
-    function updateOnlineCounter() {
-      document.getElementById('onlineUsers').textContent = `Online: ${onlineCount}`;
+    // Online users tracking
+    let lastActivityTime = Date.now();
+    
+    function updateOnlineCounter(count) {
+      document.getElementById('onlineUsers').textContent = `Online: ${count}`;
     }
     
-    // Simulate online users changing (replace with real WebSocket implementation)
-    function simulateOnlineUsers() {
-      setInterval(() => {
-        // Random fluctuation between 1-10 for demo purposes
-        onlineCount = Math.max(1, Math.floor(Math.random() * 10));
-        updateOnlineCounter();
-      }, 5000);
+    async function sendHeartbeat() {
+      try {
+        lastActivityTime = Date.now();
+        const response = await fetch('/heartbeat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            lastActivity: lastActivityTime
+          })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          updateOnlineCounter(data.onlineUsers);
+        }
+      } catch (error) {
+        console.error('Heartbeat error:', error);
+      }
+    }
+    
+    function trackActivity() {
+      lastActivityTime = Date.now();
+    }
+    
+    function initOnlineTracking() {
+      sendHeartbeat();
+      setInterval(sendHeartbeat, 15000);
+      
+      document.addEventListener('mousemove', trackActivity);
+      document.addEventListener('keydown', trackActivity);
+      document.addEventListener('click', trackActivity);
+      window.addEventListener('scroll', trackActivity);
     }
 
-    // Initialize features
-    updateClock();
-    setInterval(updateClock, 1000);
-    updateOnlineCounter();
-    simulateOnlineUsers();
+    // Initialize everything
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchWishlist();
+      updateClock();
+      setInterval(updateClock, 1000);
+      initOnlineTracking();
+    });
 
-    // Event listeners
     document.getElementById('addButton').addEventListener('click', addItem);
     document.getElementById('item').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
@@ -371,9 +391,6 @@
         addItem();
       }
     });
-
-    // Fetch messages on page load
-    window.addEventListener('DOMContentLoaded', fetchWishlist);
   </script>
 </body>
 </html>
