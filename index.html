@@ -33,6 +33,20 @@
       font-family: monospace;
     }
     
+    /* Online users counter */
+    .online-users {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      font-size: 1rem;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 5px 10px;
+      border-radius: 10px;
+      z-index: 20;
+      font-family: Arial, sans-serif;
+    }
+    
     /* Fixed header */
     header {
       background-color: #4a90e2;
@@ -174,10 +188,15 @@
         font-size: 0.95rem;
         padding: 10px 12px;
       }
-      .real-time-clock {
+      .real-time-clock, .online-users {
         font-size: 0.9rem;
         top: 10px;
+      }
+      .real-time-clock {
         left: 10px;
+      }
+      .online-users {
+        right: 10px;
       }
     }
   </style>
@@ -185,6 +204,9 @@
 <body>
   <!-- Real-time clock -->
   <div class="real-time-clock" id="realTimeClock"></div>
+  
+  <!-- Online users counter -->
+  <div class="online-users" id="onlineUsers">Online: 1</div>
   
   <!-- Fixed header -->
   <header>john secret chat💭</header>
@@ -320,9 +342,26 @@
       document.getElementById('realTimeClock').textContent = `${hours}:${minutes}:${seconds}`;
     }
 
-    // Update clock immediately and then every second
+    // Online users functionality (simulated for demo)
+    let onlineCount = 1;
+    function updateOnlineCounter() {
+      document.getElementById('onlineUsers').textContent = `Online: ${onlineCount}`;
+    }
+    
+    // Simulate online users changing (replace with real WebSocket implementation)
+    function simulateOnlineUsers() {
+      setInterval(() => {
+        // Random fluctuation between 1-10 for demo purposes
+        onlineCount = Math.max(1, Math.floor(Math.random() * 10));
+        updateOnlineCounter();
+      }, 5000);
+    }
+
+    // Initialize features
     updateClock();
     setInterval(updateClock, 1000);
+    updateOnlineCounter();
+    simulateOnlineUsers();
 
     // Event listeners
     document.getElementById('addButton').addEventListener('click', addItem);
