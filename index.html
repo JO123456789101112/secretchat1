@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,6 +66,15 @@
     /* For demo, all messages align left (you could later alternate for sender/receiver) */
     #wishlistList li span {
       word-wrap: break-word;
+      display: block;
+    }
+    .message-text {
+      margin-bottom: 5px;
+    }
+    .message-date {
+      font-size: 0.7rem;
+      color: #666;
+      text-align: right;
     }
     /* Action buttons on chat bubble */
     #wishlistList li button {
@@ -173,12 +181,23 @@
   </div>
 
   <script>
+    // Helper function to format date
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString(); // Adjust format as needed
+    }
+
     // Helper function to safely create list items
     function createListItem(item) {
       const li = document.createElement('li');
 
       const textSpan = document.createElement('span');
       textSpan.textContent = item.name;
+      textSpan.className = 'message-text';
+
+      const dateSpan = document.createElement('span');
+      dateSpan.className = 'message-date';
+      dateSpan.textContent = item.createdAt ? formatDate(item.createdAt) : formatDate(new Date());
 
       const copyButton = document.createElement('button');
       copyButton.textContent = '📋';
@@ -189,6 +208,7 @@
       deleteButton.addEventListener('click', () => deleteItem(item._id));
 
       li.appendChild(textSpan);
+      li.appendChild(dateSpan);
       li.appendChild(copyButton);
       li.appendChild(deleteButton);
 
@@ -231,7 +251,10 @@
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ name: itemName })
+            body: JSON.stringify({ 
+              name: itemName,
+              createdAt: new Date().toISOString() // Add current timestamp
+            })
           });
           if (!response.ok) {
             throw new Error('Failed to add message.');
