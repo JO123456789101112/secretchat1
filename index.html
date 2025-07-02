@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>My chat💭</title>
   <style>
+    /* Reset & Global */
     * {
       box-sizing: border-box;
     }
@@ -18,6 +19,7 @@
       height: 100vh;
     }
     
+    /* Real-time clock */
     .real-time-clock {
       position: fixed;
       top: 15px;
@@ -31,6 +33,7 @@
       font-family: monospace;
     }
     
+    /* Online users counter */
     .online-users {
       position: fixed;
       top: 15px;
@@ -44,6 +47,7 @@
       font-family: Arial, sans-serif;
     }
     
+    /* Fixed header */
     header {
       background-color: #4a90e2;
       color: #fff;
@@ -57,7 +61,7 @@
       z-index: 10;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    
+    /* Chat area container */
     .chat-area {
       flex: 1;
       margin-top: 60px;
@@ -66,11 +70,11 @@
       overflow-y: auto;
       background: #f2f2f2;
     }
-    
+    /* Chat header title hidden */
     h2 {
       display: none;
     }
-    
+    /* Chat list styles */
     #wishlistList {
       list-style: none;
       padding: 0;
@@ -79,7 +83,6 @@
       flex-direction: column;
       gap: 10px;
     }
-    
     #wishlistList li {
       background-color: #fff;
       padding: 12px 15px;
@@ -89,22 +92,19 @@
       position: relative;
       animation: slideIn 0.3s forwards;
     }
-    
     #wishlistList li span {
       word-wrap: break-word;
       display: block;
     }
-    
     .message-text {
       margin-bottom: 5px;
     }
-    
     .message-date {
       font-size: 0.7rem;
       color: #666;
       text-align: right;
     }
-    
+    /* Action buttons */
     #wishlistList li button {
       background-color: transparent;
       border: none;
@@ -112,11 +112,10 @@
       margin-left: 8px;
       cursor: pointer;
     }
-    
     #wishlistList li button:hover {
       opacity: 0.7;
     }
-    
+    /* Input container */
     .input-container {
       position: fixed;
       bottom: 0;
@@ -129,7 +128,6 @@
       box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
       z-index: 10;
     }
-    
     .input-container input[type="text"] {
       flex: 1;
       padding: 12px;
@@ -138,12 +136,13 @@
       border-radius: 20px;
       transition: border-color 0.3s ease;
     }
-    
+    .input-container input[type="text"]::placeholder {
+      color: #999;
+    }
     .input-container input[type="text"]:focus {
       border-color: #4a90e2;
       outline: none;
     }
-    
     .input-container button {
       background-color: #4a90e2;
       color: #fff;
@@ -154,19 +153,26 @@
       cursor: pointer;
       transition: background 0.3s ease, transform 0.3s ease;
     }
-    
+    .input-container button:hover {
+      background-color: #3d7bbf;
+      transform: scale(1.05);
+    }
+    .input-container button:active {
+      transform: scale(0.98);
+    }
+    /* Loading indicator */
     .loading {
       text-align: center;
       color: #555;
       font-size: 1rem;
       margin-top: 20px;
     }
-    
+    /* Animations */
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
+    /* Responsive adjustments */
     @media (max-width: 480px) {
       header {
         font-size: 1.5rem;
@@ -195,54 +201,80 @@
   </style>
 </head>
 <body>
+  <!-- Real-time clock -->
   <div class="real-time-clock" id="realTimeClock"></div>
+  
+  <!-- Online users counter -->
   <div class="online-users" id="onlineUsers">Online: Loading...</div>
+  
+  <!-- Fixed header -->
   <header>john secret chat💭</header>
 
+  <!-- Chat area -->
   <div class="chat-area" id="wishlist">
     <div id="loading" class="loading">Loading...</div>
-    <ul id="wishlistList"></ul>
+    <ul id="wishlistList">
+      <!-- Chat items will appear here -->
+    </ul>
   </div>
 
+  <!-- Fixed input container -->
   <div class="input-container">
     <input type="text" id="item" placeholder="Type your message...">
     <button id="addButton">Send</button>
   </div>
 
   <script>
-    // Helper functions
+    // Helper function to format date
     function formatDate(dateString) {
       const date = new Date(dateString);
       return date.toLocaleString();
     }
 
+    // Helper function to create list items
     function createListItem(item) {
       const li = document.createElement('li');
-      li.innerHTML = `
-        <span class="message-text">${item.name}</span>
-        <span class="message-date">${item.createdAt ? formatDate(item.createdAt) : formatDate(new Date())}</span>
-        <button title="Copy">📋</button>
-        <button title="Delete">❌</button>
-      `;
-      li.querySelector('button:nth-of-type(1)').addEventListener('click', () => copyText(item.name));
-      li.querySelector('button:nth-of-type(2)').addEventListener('click', () => deleteItem(item._id));
+
+      const textSpan = document.createElement('span');
+      textSpan.textContent = item.name;
+      textSpan.className = 'message-text';
+
+      const dateSpan = document.createElement('span');
+      dateSpan.className = 'message-date';
+      dateSpan.textContent = item.createdAt ? formatDate(item.createdAt) : formatDate(new Date());
+
+      const copyButton = document.createElement('button');
+      copyButton.textContent = '📋';
+      copyButton.addEventListener('click', () => copyText(item.name));
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = '❌';
+      deleteButton.addEventListener('click', () => deleteItem(item._id));
+
+      li.appendChild(textSpan);
+      li.appendChild(dateSpan);
+      li.appendChild(copyButton);
+      li.appendChild(deleteButton);
+
       return li;
     }
 
-    // Chat functions
     async function fetchWishlist() {
       const loadingIndicator = document.getElementById('loading');
       const wishlistList = document.getElementById('wishlistList');
       loadingIndicator.style.display = 'block';
-      
       try {
         const response = await fetch('/wishlist');
-        if (!response.ok) throw new Error('Network error');
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        wishlistList.innerHTML = data.length ? '' : '<li>No messages yet.</li>';
-        data.forEach(item => wishlistList.appendChild(createListItem(item)));
+        wishlistList.innerHTML = '';
+        if (data.length === 0) {
+          wishlistList.innerHTML = '<li>No messages yet.</li>';
+        } else {
+          data.forEach(item => wishlistList.appendChild(createListItem(item)));
+        }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching messages:', error);
         wishlistList.innerHTML = '<li>Error loading messages.</li>';
       } finally {
         loadingIndicator.style.display = 'none';
@@ -252,72 +284,96 @@
     async function addItem() {
       const itemInput = document.getElementById('item');
       const itemName = itemInput.value.trim();
-      if (!itemName) return;
-
-      try {
-        const response = await fetch('/wishlist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            name: itemName,
-            createdAt: new Date().toISOString()
-          })
-        });
-        if (!response.ok) throw new Error('Failed to add');
-        itemInput.value = '';
-        await fetchWishlist();
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error adding message');
+      if (itemName) {
+        try {
+          const response = await fetch('/wishlist', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+              name: itemName,
+              createdAt: new Date().toISOString()
+            })
+          });
+          if (!response.ok) throw new Error('Failed to add message.');
+          itemInput.value = '';
+          await fetchWishlist();
+        } catch (error) {
+          console.error('Error adding message:', error);
+          alert('Error adding message.');
+        }
       }
     }
 
     async function deleteItem(itemId) {
       try {
-        const response = await fetch(`/wishlist/${itemId}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Failed to delete');
+        const response = await fetch(`/wishlist/${itemId}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete message.');
         await fetchWishlist();
       } catch (error) {
-        console.error('Error:', error);
-        alert('Error deleting message');
+        console.error('Error deleting message:', error);
+        alert('Error deleting message.');
       }
     }
 
     function copyText(text) {
-      navigator.clipboard.writeText(text).catch(console.error);
+      navigator.clipboard.writeText(text)
+        .catch(err => console.error('Error copying text:', err));
     }
 
-    // Real-time clock
+    // Real-time clock function
     function updateClock() {
       const now = new Date();
-      document.getElementById('realTimeClock').textContent = 
-        `${String(now.getHours()).padStart(2, '0')}:` +
-        `${String(now.getMinutes()).padStart(2, '0')}:` +
-        `${String(now.getSeconds()).padStart(2, '0')}`;
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('realTimeClock').textContent = `${hours}:${minutes}:${seconds}`;
     }
 
-    // Online users tracking with SSE
-    function initOnlineTracking() {
-      const eventSource = new EventSource('/online-users-events');
-      
-      eventSource.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        document.getElementById('onlineUsers').textContent = `Online: ${data.count}`;
-      };
-      
-      eventSource.onerror = () => {
-        setTimeout(initOnlineTracking, 5000);
-      };
-      
-      // Send initial heartbeat
-      fetch('/heartbeat', { method: 'POST' });
-      
-      // Keep session alive with activity
-      ['mousemove', 'keydown', 'click', 'scroll'].forEach(event => {
-        document.addEventListener(event, () => {
-          fetch('/heartbeat', { method: 'POST' });
+    // Online users tracking
+    let lastActivityTime = Date.now();
+    
+    function updateOnlineCounter(count) {
+      document.getElementById('onlineUsers').textContent = `Online: ${count}`;
+    }
+    
+    async function sendHeartbeat() {
+      try {
+        lastActivityTime = Date.now();
+        const response = await fetch('/heartbeat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            lastActivity: lastActivityTime
+          })
         });
-      });
+        
+        if (response.ok) {
+          const data = await response.json();
+          updateOnlineCounter(data.onlineUsers);
+        }
+      } catch (error) {
+        console.error('Heartbeat error:', error);
+      }
+    }
+    
+    function trackActivity() {
+      lastActivityTime = Date.now();
+    }
+    
+    function initOnlineTracking() {
+      sendHeartbeat();
+      setInterval(sendHeartbeat, 15000);
+      
+      document.addEventListener('mousemove', trackActivity);
+      document.addEventListener('keydown', trackActivity);
+      document.addEventListener('click', trackActivity);
+      window.addEventListener('scroll', trackActivity);
     }
 
     // Initialize everything
@@ -326,11 +382,14 @@
       updateClock();
       setInterval(updateClock, 1000);
       initOnlineTracking();
-      
-      document.getElementById('addButton').addEventListener('click', addItem);
-      document.getElementById('item').addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') addItem();
-      });
+    });
+
+    document.getElementById('addButton').addEventListener('click', addItem);
+    document.getElementById('item').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addItem();
+      }
     });
   </script>
 </body>
