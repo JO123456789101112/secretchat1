@@ -20,23 +20,28 @@ app.get('/', (req, res) => {
 
 // Define Wishlist schema and model
 const wishlistSchema = new mongoose.Schema({
-    name: String
+    name: String,
+    // Add createdAt field with default value
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 const Wishlist = mongoose.model('Wishlist', wishlistSchema);
 
 // Routes
-// GET route to fetch all wishlist items
+// GET route to fetch all wishlist items - updated to sort by date
 app.get('/wishlist', async (req, res) => {
     try {
-        const items = await Wishlist.find();
+        const items = await Wishlist.find().sort({ createdAt: -1 }); // Sort by newest first
         res.json(items);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch wishlist items' });
     }
 });
 
-// POST route to add a new item to the wishlist
+// POST route to add a new item to the wishlist - no changes needed as schema handles timestamp
 app.post('/wishlist', async (req, res) => {
     const newItem = new Wishlist({ name: req.body.name });
 
@@ -48,7 +53,7 @@ app.post('/wishlist', async (req, res) => {
     }
 });
 
-// DELETE route to remove an item from the wishlist
+// DELETE route to remove an item from the wishlist - unchanged
 app.delete('/wishlist/:id', async (req, res) => {
     try {
         await Wishlist.findByIdAndDelete(req.params.id);
@@ -62,6 +67,4 @@ app.delete('/wishlist/:id', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-
-
 });
