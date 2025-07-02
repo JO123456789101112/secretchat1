@@ -4,7 +4,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 
-// Initialize app and middleware
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -13,7 +12,7 @@ app.use(bodyParser.json());
 const dbURI = "mongodb+srv://john:john@john.gevwwjw.mongodb.net/wishList?retryWrites=true&w=majority&appName=john";
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.log('Error connecting to MongoDB: ', err));
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Online users tracking
 const activeUsers = new Map();
@@ -38,10 +37,15 @@ app.get('/', (req, res) => {
 app.post('/heartbeat', (req, res) => {
   const sessionId = req.ip + req.headers['user-agent'];
   activeUsers.set(sessionId, Date.now());
-  res.json({ onlineUsers: activeUsers.size });
+  res.status(204).end();
 });
 
-// Define Wishlist schema and model
+// Online users count endpoint
+app.get('/online-users', (req, res) => {
+  res.json({ count: activeUsers.size });
+});
+
+// Wishlist model and routes
 const wishlistSchema = new mongoose.Schema({
   name: String,
   createdAt: {
@@ -52,7 +56,6 @@ const wishlistSchema = new mongoose.Schema({
 
 const Wishlist = mongoose.model('Wishlist', wishlistSchema);
 
-// Routes
 app.get('/wishlist', async (req, res) => {
   try {
     const items = await Wishlist.find().sort({ createdAt: -1 });
@@ -63,8 +66,8 @@ app.get('/wishlist', async (req, res) => {
 });
 
 app.post('/wishlist', async (req, res) => {
-  const newItem = new Wishlist({ name: req.body.name });
   try {
+    const newItem = new Wishlist({ name: req.body.name });
     await newItem.save();
     res.json(newItem);
   } catch (error) {
