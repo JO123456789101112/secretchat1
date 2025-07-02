@@ -18,6 +18,21 @@
       flex-direction: column;
       height: 100vh;
     }
+    
+    /* Real-time clock */
+    .real-time-clock {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      font-size: 1rem;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 5px 10px;
+      border-radius: 10px;
+      z-index: 20;
+      font-family: monospace;
+    }
+    
     /* Fixed header */
     header {
       background-color: #4a90e2;
@@ -159,10 +174,18 @@
         font-size: 0.95rem;
         padding: 10px 12px;
       }
+      .real-time-clock {
+        font-size: 0.9rem;
+        top: 10px;
+        left: 10px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Real-time clock -->
+  <div class="real-time-clock" id="realTimeClock"></div>
+  
   <!-- Fixed header -->
   <header>john secret chat💭</header>
 
@@ -287,6 +310,19 @@
       navigator.clipboard.writeText(text)
         .catch(err => console.error('Error copying text:', err));
     }
+
+    // Real-time clock function
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('realTimeClock').textContent = `${hours}:${minutes}:${seconds}`;
+    }
+
+    // Update clock immediately and then every second
+    updateClock();
+    setInterval(updateClock, 1000);
 
     // Event listeners
     document.getElementById('addButton').addEventListener('click', addItem);
