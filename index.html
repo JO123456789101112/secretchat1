@@ -1,245 +1,281 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
-  <title>Secure Chat💭</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>My chat💭</title>
   <style>
-    /* Color Scheme (unchanged from original) */
-    :root {
-      --primary-blue: #4a90e2;
-      --bg-light: #e5e5e5;
-      --chat-bg: #f2f2f2;
-      --white: #ffffff;
-    }
-    
+    /* Reset & Global */
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
-    
     body {
       font-family: Arial, sans-serif;
-      background: var(--bg-light);
+      margin: 0;
+      padding: 0;
+      background: #e5e5e5;
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
-    
-    /* Header (unchanged) */
+    /* Fixed header */
     header {
-      background-color: var(--primary-blue);
-      color: white;
+      background-color: #4a90e2;
+      color: #fff;
       text-align: center;
       padding: 15px;
       font-size: 1.8rem;
       position: fixed;
       top: 0;
+      left: 0;
       width: 100%;
       z-index: 10;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    
-    /* Enhanced Chat Area */
+    /* Chat area container (fills space between header and input) */
     .chat-area {
       flex: 1;
-      margin: 60px 0 70px;
+      margin-top: 60px; /* header height */
+      margin-bottom: 70px; /* input container height */
       padding: 10px;
       overflow-y: auto;
-      background: var(--chat-bg);
+      background: #f2f2f2;
+    }
+    /* Chat header title hidden in new design (but h2 preserved for functionality) */
+    h2 {
+      display: none;
+    }
+    /* Chat list styles (chat bubbles) */
+    #wishlistList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
       display: flex;
       flex-direction: column;
+      gap: 10px;
     }
-    
-    /* Message Bubbles */
-    .message {
+    #wishlistList li {
+      background-color: #fff;
+      padding: 12px 15px;
+      border-radius: 20px;
       max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 18px;
-      margin-bottom: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       position: relative;
-      animation: fadeIn 0.3s ease-out;
-      word-break: break-word;
+      animation: slideIn 0.3s forwards;
     }
-    
-    .sent {
-      align-self: flex-end;
-      background: var(--primary-blue);
-      color: white;
-      border-bottom-right-radius: 4px;
+    /* For demo, all messages align left (you could later alternate for sender/receiver) */
+    #wishlistList li span {
+      word-wrap: break-word;
     }
-    
-    .received {
-      align-self: flex-start;
-      background: var(--white);
-      color: #333;
-      border-bottom-left-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    /* Action buttons on chat bubble */
+    #wishlistList li button {
+      background-color: transparent;
+      border: none;
+      font-size: 1.2rem;
+      margin-left: 8px;
+      cursor: pointer;
     }
-    
-    /* Timestamp */
-    .timestamp {
-      display: block;
-      font-size: 0.7rem;
-      opacity: 0.8;
-      margin-top: 4px;
-      text-align: right;
+    #wishlistList li button:hover {
+      opacity: 0.7;
     }
-    
-    .sent .timestamp {
-      color: rgba(255,255,255,0.8);
-    }
-    
-    /* Input Area (unchanged structure) */
+    /* Fixed input container at the bottom */
     .input-container {
       position: fixed;
       bottom: 0;
+      left: 0;
       width: 100%;
-      background: var(--white);
+      background: #fff;
       padding: 10px 15px;
       display: flex;
       gap: 10px;
       box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
       z-index: 10;
     }
-    
-    #messageInput {
+    .input-container input[type="text"] {
       flex: 1;
       padding: 12px;
+      font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 20px;
-      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    .input-container input[type="text"]::placeholder {
+      color: #999;
+    }
+    .input-container input[type="text"]:focus {
+      border-color: #4a90e2;
       outline: none;
     }
-    
-    #sendButton {
-      background: var(--primary-blue);
-      color: white;
+    .input-container button {
+      background-color: #4a90e2;
+      color: #fff;
+      padding: 12px 20px;
+      font-size: 1rem;
       border: none;
       border-radius: 20px;
-      padding: 0 20px;
-      font-size: 1rem;
       cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
     }
-    
-    /* Animations */
-    @keyframes fadeIn {
+    .input-container button:hover {
+      background-color: #3d7bbf;
+      transform: scale(1.05);
+    }
+    .input-container button:active {
+      transform: scale(0.98);
+    }
+    /* Loading indicator styling inside chat area */
+    .loading {
+      text-align: center;
+      color: #555;
+      font-size: 1rem;
+      margin-top: 20px;
+    }
+    /* Chat bubble slide in animation */
+    @keyframes slideIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
-    /* Utility Classes */
-    .typing-indicator {
-      font-style: italic;
-      color: #666;
-      padding: 8px 12px;
-      font-size: 0.9rem;
-      align-self: flex-start;
+    /* Responsive adjustments for smaller mobile screens */
+    @media (max-width: 480px) {
+      header {
+        font-size: 1.5rem;
+        padding: 10px;
+      }
+      .input-container input[type="text"],
+      .input-container button {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      #wishlistList li {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+      }
     }
   </style>
 </head>
 <body>
-  <header>Secure Chat💭</header>
-  
-  <div class="chat-area" id="chatArea">
-    <div id="typingIndicator" class="typing-indicator" style="display:none">Someone is typing...</div>
-    <div id="messagesContainer"></div>
+  <!-- Fixed header -->
+  <header>john secret chat💭</header>
+
+  <!-- Chat area -->
+  <div class="chat-area" id="wishlist">
+    <div id="loading" class="loading">Loading...</div>
+    <ul id="wishlistList">
+      <!-- Chat items will appear here -->
+    </ul>
   </div>
-  
+
+  <!-- Fixed input container -->
   <div class="input-container">
-    <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
-    <button id="sendButton">Send</button>
+    <input type="text" id="item" placeholder="Type your message...">
+    <button id="addButton">Send</button>
   </div>
 
   <script>
-    // Security & Utility Functions
-    function sanitizeInput(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+    // Helper function to safely create list items
+    function createListItem(item) {
+      const li = document.createElement('li');
+
+      const textSpan = document.createElement('span');
+      textSpan.textContent = item.name;
+
+      const copyButton = document.createElement('button');
+      copyButton.textContent = '📋';
+      copyButton.addEventListener('click', () => copyText(item.name));
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = '❌';
+      deleteButton.addEventListener('click', () => deleteItem(item._id));
+
+      li.appendChild(textSpan);
+      li.appendChild(copyButton);
+      li.appendChild(deleteButton);
+
+      return li;
     }
-    
-    // DOM Elements
-    const chatArea = document.getElementById('chatArea');
-    const messagesContainer = document.getElementById('messagesContainer');
-    const messageInput = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
-    const typingIndicator = document.getElementById('typingIndicator');
-    
-    // Message Handling
-    function createMessage(content, isSent = true) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
-      
-      const contentSpan = document.createElement('span');
-      contentSpan.textContent = content;
-      
-      const timeSpan = document.createElement('span');
-      timeSpan.className = 'timestamp';
-      timeSpan.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      messageDiv.appendChild(contentSpan);
-      messageDiv.appendChild(timeSpan);
-      
-      return messageDiv;
+
+    async function fetchWishlist() {
+      const loadingIndicator = document.getElementById('loading');
+      const wishlistList = document.getElementById('wishlistList');
+      loadingIndicator.style.display = 'block';
+      try {
+        const response = await fetch('/wishlist');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        wishlistList.innerHTML = ''; // Clear current list
+        if (data.length === 0) {
+          wishlistList.innerHTML = '<li>No messages yet.</li>';
+        } else {
+          data.forEach(item => {
+            wishlistList.appendChild(createListItem(item));
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+        wishlistList.innerHTML = '<li>Error loading messages.</li>';
+      } finally {
+        loadingIndicator.style.display = 'none';
+      }
     }
-    
-    function scrollToBottom() {
-      chatArea.scrollTop = chatArea.scrollHeight;
+
+    async function addItem() {
+      const itemInput = document.getElementById('item');
+      const itemName = itemInput.value.trim();
+      if (itemName) {
+        try {
+          const response = await fetch('/wishlist', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: itemName })
+          });
+          if (!response.ok) {
+            throw new Error('Failed to add message.');
+          }
+          itemInput.value = '';
+          await fetchWishlist();
+        } catch (error) {
+          console.error('Error adding message:', error);
+          alert('Error adding message.');
+        }
+      }
     }
-    
-    // Simulated "server" in memory
-    const chatHistory = [];
-    let typingTimeout;
-    
-    // Event Handlers
-    function handleSend() {
-      const content = messageInput.value.trim();
-      if (!content) return;
-      
-      // Sanitize and store
-      const sanitized = sanitizeInput(content);
-      chatHistory.push({ content: sanitized, sent: true, time: new Date() });
-      
-      // Display message
-      messagesContainer.appendChild(createMessage(sanitized, true));
-      messageInput.value = '';
-      scrollToBottom();
-      
-      // Simulate received response
-      typingIndicator.style.display = 'block';
-      scrollToBottom();
-      
-      clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        typingIndicator.style.display = 'none';
-        const response = "Thanks for your message!";
-        chatHistory.push({ content: response, sent: false, time: new Date() });
-        messagesContainer.appendChild(createMessage(response, false));
-        scrollToBottom();
-      }, 1500);
+
+    async function deleteItem(itemId) {
+      try {
+        const response = await fetch(`/wishlist/${itemId}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) {
+          throw new Error('Failed to delete message.');
+        }
+        await fetchWishlist();
+      } catch (error) {
+        console.error('Error deleting message:', error);
+        alert('Error deleting message.');
+      }
     }
-    
-    // Event Listeners
-    sendButton.addEventListener('click', handleSend);
-    messageInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') handleSend();
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text)
+        .catch(err => console.error('Error copying text:', err));
+    }
+
+    // Event listeners
+    document.getElementById('addButton').addEventListener('click', addItem);
+    document.getElementById('item').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addItem();
+      }
     });
-    
-    // Initial focus
-    messageInput.focus();
-    
-    // Load any initial messages
-    window.addEventListener('DOMContentLoaded', () => {
-      // Simulate loading existing messages
-      setTimeout(() => {
-        const welcomeMsg = "Welcome to secure chat!";
-        messagesContainer.appendChild(createMessage(welcomeMsg, false));
-        scrollToBottom();
-      }, 500);
-    });
+
+    // Fetch messages on page load
+    window.addEventListener('DOMContentLoaded', fetchWishlist);
   </script>
 </body>
 </html>
