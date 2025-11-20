@@ -18,9 +18,9 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 // ====== Cloudinary Config ======
 cloudinary.config({
-  cloud_name: 'YOUR_CLOUD_NAME',    // ضع هنا اسم الحساب الخاص بك
-  api_key: 'YOUR_API_KEY',           // ضع هنا API Key
-  api_secret: 'YOUR_API_SECRET',     // ضع هنا API Secret
+  cloud_name: 'secret_chat_upload',    // ضع هنا اسم الحساب الخاص بك
+  api_key: '766727584766197',           // ضع هنا API Key
+  api_secret: 'hZ1sFtaXJYvLDCAaBNRKdO3pjHU',     // ضع هنا API Secret
 });
 
 // ====== Online Users Tracking ======
