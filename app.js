@@ -10,7 +10,6 @@ app.use(bodyParser.json());
 
 // MongoDB Atlas connection
 const dbURI = "mongodb+srv://john:john@john.gevwwjw.mongodb.net/wishList?retryWrites=true&w=majority&appName=john";
-
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
@@ -29,7 +28,7 @@ setInterval(() => {
   }
 }, 10000);
 
-// Serve static HTML
+// Serve static file
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -46,7 +45,7 @@ app.get('/online-users', (req, res) => {
   res.json({ count: activeUsers.size });
 });
 
-// Wishlist Model
+// Wishlist model
 const wishlistSchema = new mongoose.Schema({
   name: String,
   createdAt: {
@@ -86,5 +85,5 @@ app.delete('/wishlist/:id', async (req, res) => {
   }
 });
 
-// IMPORTANT for Vercel 🚀
+// IMPORTANT for Vercel
 module.exports = app;
