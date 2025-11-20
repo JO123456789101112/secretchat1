@@ -10,13 +10,14 @@ app.use(bodyParser.json());
 
 // MongoDB Atlas connection
 const dbURI = "mongodb+srv://john:john@john.gevwwjw.mongodb.net/wishList?retryWrites=true&w=majority&appName=john";
+
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
 // Online users tracking
 const activeUsers = new Map();
-const USER_TIMEOUT = 30000; // 30 seconds
+const USER_TIMEOUT = 30000;
 
 // Clean up inactive users
 setInterval(() => {
@@ -26,9 +27,9 @@ setInterval(() => {
       activeUsers.delete(sessionId);
     }
   }
-}, 10000); // Check every 10 seconds
+}, 10000);
 
-// Serve static file
+// Serve static HTML
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -40,12 +41,12 @@ app.post('/heartbeat', (req, res) => {
   res.status(204).end();
 });
 
-// Online users count endpoint
+// Online users count
 app.get('/online-users', (req, res) => {
   res.json({ count: activeUsers.size });
 });
 
-// Wishlist model and routes
+// Wishlist Model
 const wishlistSchema = new mongoose.Schema({
   name: String,
   createdAt: {
@@ -56,6 +57,7 @@ const wishlistSchema = new mongoose.Schema({
 
 const Wishlist = mongoose.model('Wishlist', wishlistSchema);
 
+// Routes
 app.get('/wishlist', async (req, res) => {
   try {
     const items = await Wishlist.find().sort({ createdAt: -1 });
@@ -84,11 +86,5 @@ app.delete('/wishlist/:id', async (req, res) => {
   }
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-
-
+// IMPORTANT for Vercel 🚀
+module.exports = app;
