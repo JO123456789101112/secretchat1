@@ -68,18 +68,21 @@ app.get('/wishlist', async (req, res) => {
   }
 });
 
-// POST new item with optional image URL
+// POST new item with optional image
 app.post('/wishlist', async (req, res) => {
   try {
-    const { name, imageUrl } = req.body; // رابط الصورة جاهز من Cloudinary
+    const { name, imageUrl } = req.body;
+
     const newItem = new Wishlist({ name, imageUrl });
     await newItem.save();
+
     res.json(newItem);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to add item to wishlist' });
   }
 });
+
 
 // DELETE item by id
 app.delete('/wishlist/:id', async (req, res) => {
