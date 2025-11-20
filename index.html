@@ -61,7 +61,7 @@
       flex-direction: column;
       gap: 5px;
     }
-    .bubble img { max-width: 150px; border-radius: 15px; }
+    .bubble img { max-width: 150px; border-radius: 15px; margin-top: 5px; }
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -144,13 +144,14 @@ function createBubble(item){
 
 // FETCH MESSAGES
 async function fetchWishlist(){
-  const res = await fetch('/wishlist');
-  const data = await res.json();
-  const list = document.getElementById('wishlistList');
-
-  list.innerHTML = '';
-  data.forEach(msg => list.appendChild(createBubble(msg)));
-  document.querySelector('.chat-area').scrollTop = 999999;
+  try {
+    const res = await fetch('/wishlist');
+    const data = await res.json();
+    const list = document.getElementById('wishlistList');
+    list.innerHTML = '';
+    data.forEach(msg => list.appendChild(createBubble(msg)));
+    document.querySelector('.chat-area').scrollTop = 999999;
+  } catch(e){ console.error(e); }
 }
 
 // UPLOAD IMAGE TO CLOUDINARY
@@ -159,8 +160,8 @@ async function uploadImage(file){
   formData.append("file", file);
   formData.append("upload_preset", UPLOAD_PRESET);
 
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,{
-    method:"POST",
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+    method: "POST",
     body: formData
   });
   const data = await res.json();
@@ -175,17 +176,21 @@ async function addItem(){
   let imageUrl = null;
 
   if(fileInput.files.length>0){
-    imageUrl = await uploadImage(fileInput.files[0]);
-    fileInput.value = "";
+    try {
+      imageUrl = await uploadImage(fileInput.files[0]);
+      fileInput.value = "";
+    } catch(e){ alert("Failed to upload image"); console.error(e); return; }
   }
 
   if(!text && !imageUrl) return;
 
-  await fetch('/wishlist',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({name:text, imageUrl, createdAt:new Date().toISOString()})
-  });
+  try {
+    await fetch('/wishlist',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name:text, imageUrl, createdAt:new Date().toISOString()})
+    });
+  } catch(e){ console.error(e); }
 
   input.value='';
   fetchWishlist();
@@ -193,8 +198,10 @@ async function addItem(){
 
 // DELETE
 async function deleteItem(id){
-  await fetch(`/wishlist/${id}`,{method:'DELETE'});
-  fetchWishlist();
+  try {
+    await fetch(`/wishlist/${id}`,{method:'DELETE'});
+    fetchWishlist();
+  } catch(e){ console.error(e); }
 }
 
 // COPY
@@ -205,9 +212,11 @@ setInterval(()=>{ const n=new Date(); document.getElementById('realTimeClock').t
 
 // ONLINE USERS
 setInterval(async()=>{
-  const r=await fetch('/online-users');
-  const d=await r.json();
-  document.getElementById('onlineUsers').textContent=`Online: ${d.count}`;
+  try {
+    const r = await fetch('/online-users');
+    const d = await r.json();
+    document.getElementById('onlineUsers').textContent=`Online: ${d.count}`;
+  } catch(e){ console.error(e); }
 },3000);
 
 // HEARTBEAT
