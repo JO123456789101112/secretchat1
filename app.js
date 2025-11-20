@@ -4,24 +4,16 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-const cloudinary = require('cloudinary').v2;
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json({ limit: '10mb' })); // لدعم رفع الصور الكبيرة
+app.use(bodyParser.json()); // لا داعي للـ 10mb لأننا مش هنرفع Base64
 
 // ====== MongoDB Connection ======
 const dbURI = "mongodb+srv://john:john@john.gevwwjw.mongodb.net/wishList?retryWrites=true&w=majority&appName=john";
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
-
-// ====== Cloudinary Config ======
-cloudinary.config({
-  cloud_name: 'secret_chat_upload',    // ضع هنا اسم الحساب الخاص بك
-  api_key: '766727584766197',           // ضع هنا API Key
-  api_secret: 'hZ1sFtaXJYvLDCAaBNRKdO3pjHU',     // ضع هنا API Secret
-});
 
 // ====== Online Users Tracking ======
 const activeUsers = new Map();
@@ -76,21 +68,10 @@ app.get('/wishlist', async (req, res) => {
   }
 });
 
-// POST new item with optional image
+// POST new item with optional image URL
 app.post('/wishlist', async (req, res) => {
   try {
-    const { name, imageBase64 } = req.body; // imageBase64: بيانات الصورة بالـ Base64
-    let imageUrl = null;
-
-    // رفع الصورة على Cloudinary لو موجودة
-    if (imageBase64) {
-      const uploadResponse = await cloudinary.uploader.upload(imageBase64, {
-        folder: 'secret_chat_upload', // اسم الـ folder في Cloudinary
-        upload_preset: 'secret_chat_upload', // اسم الـ upload preset
-      });
-      imageUrl = uploadResponse.secure_url;
-    }
-
+    const { name, imageUrl } = req.body; // رابط الصورة جاهز من Cloudinary
     const newItem = new Wishlist({ name, imageUrl });
     await newItem.save();
     res.json(newItem);
