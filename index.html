@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>My chat💭</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>My chat JAW 💭</title>
   <style>
     /* Reset & Global */
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+    :root{
+      --bg:#e5e5e5;
+      --chat-bg:#f2f2f2;
+      --primary:#4a90e2;
+      --text:#111;
+      --panel:#fff;
+    }
+    [data-theme="dark"]{
+      --bg:#0f1720;
+      --chat-bg:#0b1220;
+      --primary:#2b6ea3;
+      --text:#e6eef8;
+      --panel:#0b1220;
     }
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: #e5e5e5;
+      background: var(--bg);
       display: flex;
       flex-direction: column;
       height: 100vh;
+      color: var(--text);
     }
-    
     /* Real-time clock */
     .real-time-clock {
       position: fixed;
@@ -26,13 +38,12 @@
       left: 15px;
       font-size: 1rem;
       color: white;
-      background-color: rgba(0, 0, 0, 0.3);
+      background-color: rgba(0,0,0,0.3);
       padding: 5px 10px;
       border-radius: 10px;
       z-index: 20;
       font-family: monospace;
     }
-    
     /* Online users counter */
     .online-users {
       position: fixed;
@@ -40,344 +51,547 @@
       right: 15px;
       font-size: 1rem;
       color: white;
-      background-color: rgba(0, 0, 0, 0.3);
+      background-color: rgba(0,0,0,0.3);
       padding: 5px 10px;
       border-radius: 10px;
       z-index: 20;
       font-family: Arial, sans-serif;
     }
-    
     /* Fixed header */
     header {
-      background-color: #4a90e2;
       color: #fff;
       text-align: center;
-      padding: 15px;
-      font-size: 1.8rem;
+      padding: 15px 60px;
+      font-size: 1.6rem;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       z-index: 10;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(45deg,var(--primary), #1f7ed5);
+      animation: gradientMove 8s infinite alternate;
     }
+    @keyframes gradientMove {
+      0%{ filter: hue-rotate(0deg); }
+      100%{ filter: hue-rotate(30deg); }
+    }
+    header .left {
+      display:flex; align-items:center; gap:12px; padding-left:12px;
+    }
+    header .controls { display:flex; gap:8px; align-items:center; padding-right:12px;}
+    header button { background:transparent; border:none; color:white; cursor:pointer; font-size:1rem; padding:6px 8px; border-radius:8px;}
+    header button:hover{ opacity:.9; transform:translateY(-1px); }
+
     /* Chat area container */
     .chat-area {
       flex: 1;
-      margin-top: 60px;
-      margin-bottom: 70px;
-      padding: 10px;
+      margin-top: 70px;
+      margin-bottom: 90px;
+      padding: 16px;
       overflow-y: auto;
-      background: #f2f2f2;
+      background: var(--chat-bg);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
     }
-    /* Chat header title hidden */
-    h2 {
-      display: none;
+
+    /* Message list */
+    #wishlistList { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;}
+    .msg {
+      max-width:86%;
+      padding:12px 14px;
+      border-radius:14px;
+      box-shadow:0 2px 4px rgba(0,0,0,0.08);
+      position:relative;
+      display:inline-block;
+      word-wrap:break-word;
+      animation: slideIn .2s ease;
     }
-    /* Chat list styles */
-    #wishlistList {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .msg .meta {
+      font-size:0.75rem; color: rgba(0,0,0,0.6); margin-bottom:6px;
     }
-    #wishlistList li {
-      background-color: #fff;
-      padding: 12px 15px;
-      border-radius: 20px;
-      max-width: 80%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      position: relative;
-      animation: slideIn 0.3s forwards;
+    .msg .meta small { color:rgba(0,0,0,0.5); display:block; font-size:0.7rem; margin-top:6px; text-align:right;}
+    .msg.me { margin-left:auto; background:var(--primary); color:white; border-bottom-right-radius:4px; }
+    .msg.other { margin-right:auto; background:var(--panel); color:var(--text); border-bottom-left-radius:4px; }
+
+    .msg .reply {
+      font-size:0.8rem;
+      padding:6px;
+      border-left:3px solid rgba(0,0,0,0.08);
+      margin-bottom:8px;
+      opacity:0.95;
+      background: rgba(255,255,255,0.03);
+      border-radius:6px;
     }
-    #wishlistList li span {
-      word-wrap: break-word;
-      display: block;
+    .msg img.preview { max-width:220px; display:block; margin-top:8px; border-radius:8px; }
+
+    .msg .actions {
+      margin-top:8px;
+      display:flex;
+      gap:6px;
+      align-items:center;
     }
-    .message-text {
-      margin-bottom: 5px;
-    }
-    .message-date {
-      font-size: 0.7rem;
-      color: #666;
-      text-align: right;
-    }
-    /* Action buttons */
-    #wishlistList li button {
-      background-color: transparent;
-      border: none;
-      font-size: 1.2rem;
-      margin-left: 8px;
-      cursor: pointer;
-    }
-    #wishlistList li button:hover {
-      opacity: 0.7;
-    }
+    .reacts { display:flex; gap:6px; align-items:center; }
+    .reacts button { background:transparent; border:none; cursor:pointer; font-size:1.05rem; padding:4px; border-radius:6px;}
+    .msg .small-btn { background:transparent; border:none; cursor:pointer; color:inherit; font-size:0.95rem; padding:6px; border-radius:8px;}
+
     /* Input container */
     .input-container {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      background: #fff;
-      padding: 10px 15px;
+      background: var(--panel);
+      padding: 10px 12px;
       display: flex;
       gap: 10px;
-      box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.12);
       z-index: 10;
+      align-items:center;
     }
     .input-container input[type="text"] {
       flex: 1;
       padding: 12px;
       font-size: 1rem;
       border: 1px solid #ccc;
-      border-radius: 20px;
+      border-radius: 24px;
       transition: border-color 0.3s ease;
+      background:transparent;
+      color:var(--text);
     }
-    .input-container input[type="text"]::placeholder {
-      color: #999;
-    }
-    .input-container input[type="text"]:focus {
-      border-color: #4a90e2;
-      outline: none;
-    }
-    .input-container button {
-      background-color: #4a90e2;
-      color: #fff;
-      padding: 12px 20px;
+    .input-container input[type="file"] { display:none; }
+    .input-container .btn {
+      background-color:var(--primary);
+      color:#fff;
+      padding: 10px 14px;
       font-size: 1rem;
       border: none;
-      border-radius: 20px;
+      border-radius: 18px;
       cursor: pointer;
-      transition: background 0.3s ease, transform 0.3s ease;
     }
-    .input-container button:hover {
-      background-color: #3d7bbf;
-      transform: scale(1.05);
+    .input-container .icon-btn { background:transparent; border: none; cursor:pointer; font-size:1.2rem; padding:8px; color:var(--text); }
+
+    /* small helpers */
+    .typing { font-size:0.9rem; color:rgba(0,0,0,0.6); padding-left:12px; }
+    .loading { text-align:center; color:#555; font-size:1rem; margin-top:20px;}
+    @keyframes slideIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:none;} }
+    @media (max-width:480px){
+      header { padding:10px; font-size:1.1rem; }
+      .msg img.preview{ max-width:140px; }
     }
-    .input-container button:active {
-      transform: scale(0.98);
-    }
-    /* Loading indicator */
-    .loading {
-      text-align: center;
-      color: #555;
-      font-size: 1rem;
-      margin-top: 20px;
-    }
-    /* Animations */
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* Responsive adjustments */
-    @media (max-width: 480px) {
-      header {
-        font-size: 1.5rem;
-        padding: 10px;
-      }
-      .input-container input[type="text"],
-      .input-container button {
-        padding: 10px;
-        font-size: 0.9rem;
-      }
-      #wishlistList li {
-        font-size: 0.95rem;
-        padding: 10px 12px;
-      }
-      .real-time-clock, .online-users {
-        font-size: 0.9rem;
-        top: 10px;
-      }
-      .real-time-clock {
-        left: 10px;
-      }
-      .online-users {
-        right: 10px;
-      }
-    }
+    /* emoji panel */
+    .emoji-panel { position:absolute; bottom:70px; right:12px; background:var(--panel); border-radius:8px; padding:8px; display:flex; gap:6px; box-shadow:0 6px 18px rgba(0,0,0,0.15);}
+    .emoji-panel button { background:transparent; border:none; font-size:1.2rem; cursor:pointer; }
   </style>
 </head>
 <body>
-  <!-- Real-time clock -->
   <div class="real-time-clock" id="realTimeClock"></div>
-  
-  <!-- Online users counter -->
   <div class="online-users" id="onlineUsers">Online: Loading...</div>
-  
-  <!-- Fixed header -->
-  <header>john secret chat💭</header>
 
-  <!-- Chat area -->
+  <header>
+    <div class="left">
+      <div style="font-weight:700">john secret chat💭</div>
+      <div style="font-size:0.9rem; opacity:0.9; margin-left:8px">live</div>
+    </div>
+    <div class="controls">
+      <button id="themeToggle" title="Toggle theme">🌙</button>
+      <button id="usernameBtn" title="Change username">Set name</button>
+    </div>
+  </header>
+
   <div class="chat-area" id="wishlist">
     <div id="loading" class="loading">Loading...</div>
-    <ul id="wishlistList">
-      <!-- Chat items will appear here -->
-    </ul>
+    <ul id="wishlistList"></ul>
+    <div id="typingIndicator" class="typing" style="display:none"></div>
   </div>
 
-  <!-- Fixed input container -->
   <div class="input-container">
-    <input type="text" id="item" placeholder="Type your message...">
-    <button id="addButton">Send</button>
+    <button class="icon-btn" id="emojiToggle" title="Emoji">😊</button>
+    <input type="text" id="item" placeholder="Type your message..." autocomplete="off">
+    <input type="file" id="imageInput" accept="image/*">
+    <button class="icon-btn" id="attachBtn" title="Attach image">📎</button>
+    <button class="btn" id="addButton">Send</button>
+    <div id="emojiPanel" class="emoji-panel" style="display:none">
+      <button>😄</button><button>😂</button><button>❤️</button><button>👍</button><button>😮</button><button>😡</button>
+    </div>
   </div>
 
+  <!-- socket.io client -->
+  <script src="/socket.io/socket.io.js"></script>
   <script>
-    // Helper function to format date
-    function formatDate(dateString) {
+    // -------------------------
+    // Config & utilities
+    // -------------------------
+    const socket = io();
+    const wishlistList = document.getElementById('wishlistList');
+    const loadingIndicator = document.getElementById('loading');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const onlineEl = document.getElementById('onlineUsers');
+    const clockEl = document.getElementById('realTimeClock');
+
+    // username persisted
+    function getUsername(){
+      return localStorage.getItem('chat_username') || (() => {
+        const name = prompt('Choose a username (will be saved locally):','john') || 'john';
+        localStorage.setItem('chat_username', name);
+        return name;
+      })();
+    }
+    let username = getUsername();
+
+    document.getElementById('usernameBtn').addEventListener('click', () => {
+      const name = prompt('New username:', username) || username;
+      username = name;
+      localStorage.setItem('chat_username', name);
+      alert('Username saved: ' + name);
+    });
+
+    // theme
+    function applyTheme(theme){
+      document.documentElement.setAttribute('data-theme', theme);
+      document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('chat_theme', theme);
+    }
+    const savedTheme = localStorage.getItem('chat_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+
+    // format date
+    function formatDate(dateString){
       const date = new Date(dateString);
       return date.toLocaleString();
     }
 
-    // Helper function to create list items
-    function createListItem(item) {
+    // -------------------------
+    // Create message node
+    // -------------------------
+    function createListItem(item){
       const li = document.createElement('li');
+      li.dataset.id = item._id || item.id || '';
+      li.className = 'msg ' + ((item.username === username) ? 'me' : 'other');
 
-      const textSpan = document.createElement('span');
-      textSpan.textContent = item.name;
-      textSpan.className = 'message-text';
+      // header: name + time
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.innerHTML = `<strong>${escapeHtml(item.username||'anon')}</strong> • <small>${formatDate(item.createdAt||new Date())}</small>`;
 
-      const dateSpan = document.createElement('span');
-      dateSpan.className = 'message-date';
-      dateSpan.textContent = item.createdAt ? formatDate(item.createdAt) : formatDate(new Date());
+      // reply block
+      if(item.replyTo && item.replyText){
+        const reply = document.createElement('div');
+        reply.className = 'reply';
+        reply.textContent = item.replyText;
+        li.appendChild(reply);
+      }
 
-      const copyButton = document.createElement('button');
-      copyButton.textContent = '📋';
-      copyButton.addEventListener('click', () => copyText(item.name));
+      // message text or image
+      if(item.image){
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.className = 'preview';
+        li.appendChild(meta);
+        if(item.name) {
+          const text = document.createElement('div');
+          text.textContent = item.name;
+          li.appendChild(text);
+        }
+        li.appendChild(img);
+      } else {
+        li.appendChild(meta);
+        const text = document.createElement('div');
+        text.className = 'message-text';
+        text.textContent = item.name;
+        li.appendChild(text);
+      }
 
-      const deleteButton = document.createElement('button');
-      deleteButton.textContent = '❌';
-      deleteButton.addEventListener('click', () => deleteItem(item._id));
+      // edited mark
+      if(item.edited) {
+        const small = document.createElement('small');
+        small.style.display='block';
+        small.style.opacity='0.7';
+        small.textContent = 'edited';
+        li.appendChild(small);
+      }
 
-      li.appendChild(textSpan);
-      li.appendChild(dateSpan);
-      li.appendChild(copyButton);
-      li.appendChild(deleteButton);
+      // actions: reactions, reply, edit, copy, delete (delete still uses your original endpoint)
+      const actions = document.createElement('div');
+      actions.className = 'actions';
 
+      // reactions
+      const reacts = document.createElement('div');
+      reacts.className = 'reacts';
+      const emojis = ['❤️','👍','😂','😮','😡'];
+      emojis.forEach(e => {
+        const btn = document.createElement('button');
+        btn.textContent = e + (item.reactions && item.reactions[e] ? ' '+item.reactions[e] : '');
+        btn.title = 'React';
+        btn.addEventListener('click', () => {
+          socket.emit('react', { id: item._id, emoji: e });
+        });
+        reacts.appendChild(btn);
+      });
+      actions.appendChild(reacts);
+
+      // reply
+      const replyBtn = document.createElement('button');
+      replyBtn.className = 'small-btn';
+      replyBtn.textContent = 'Reply';
+      replyBtn.addEventListener('click', () => {
+        const toReply = { id: item._id, text: item.name || item.replyText || '' , username: item.username};
+        localStorage.setItem('chat_reply', JSON.stringify(toReply));
+        document.getElementById('item').focus();
+        document.getElementById('item').placeholder = `Replying to ${toReply.username}: ${toReply.text}`;
+      });
+      actions.appendChild(replyBtn);
+
+      // edit (only for own messages)
+      if(item.username === username){
+        const editBtn = document.createElement('button');
+        editBtn.className = 'small-btn';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', () => {
+          const newText = prompt('Edit your message:', item.name);
+          if(newText !== null && newText.trim() !== ''){
+            fetch('/wishlist/' + item._id, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: newText.trim() })
+            }).then(res => {
+              if(!res.ok) throw new Error('Edit failed');
+            }).catch(err => alert('Failed to edit: ' + err));
+          }
+        });
+        actions.appendChild(editBtn);
+      }
+
+      // copy
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'small-btn';
+      copyBtn.textContent = '📋';
+      copyBtn.addEventListener('click', () => navigator.clipboard.writeText(item.name || '').catch(()=>{}));
+      actions.appendChild(copyBtn);
+
+      // delete (keeps your original delete endpoint)
+      const delBtn = document.createElement('button');
+      delBtn.className = 'small-btn';
+      delBtn.textContent = '❌';
+      delBtn.addEventListener('click', () => {
+        if(confirm('Delete this message?')){
+          fetch('/wishlist/' + item._id, { method: 'DELETE' })
+            .then(r => {
+              if(!r.ok) throw new Error('Delete failed');
+            }).catch(e=> alert('Delete failed'));
+        }
+      });
+      actions.appendChild(delBtn);
+
+      li.appendChild(actions);
       return li;
     }
 
-    async function fetchWishlist() {
-      const loadingIndicator = document.getElementById('loading');
-      const wishlistList = document.getElementById('wishlistList');
+    // escape
+    function escapeHtml(unsafe){
+      return unsafe ? unsafe.replace(/[&<"']/g, function(m){ return {'&':'&amp;','<':'&lt;','"':'&quot;',"'":'&#039;'}[m]; }) : '';
+    }
+
+    // -------------------------
+    // Fetch & render wishlist (initial)
+    // -------------------------
+    async function fetchWishlist(){
       loadingIndicator.style.display = 'block';
-      try {
+      try{
         const response = await fetch('/wishlist');
-        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         wishlistList.innerHTML = '';
-        if (data.length === 0) {
-          wishlistList.innerHTML = '<li>No messages yet.</li>';
+        if(!Array.isArray(data) || data.length === 0){
+          wishlistList.innerHTML = '<li class="msg other">No messages yet.</li>';
         } else {
           data.forEach(item => wishlistList.appendChild(createListItem(item)));
+          autoScroll();
         }
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-        wishlistList.innerHTML = '<li>Error loading messages.</li>';
+      } catch(e){
+        wishlistList.innerHTML = '<li class="msg other">Error loading messages.</li>';
       } finally {
         loadingIndicator.style.display = 'none';
       }
     }
 
-    async function addItem() {
-      const itemInput = document.getElementById('item');
-      const itemName = itemInput.value.trim();
-      if (itemName) {
-        try {
-          const response = await fetch('/wishlist', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-              name: itemName,
-              createdAt: new Date().toISOString()
-            })
-          });
-          if (!response.ok) throw new Error('Failed to add message.');
-          itemInput.value = '';
-          await fetchWishlist();
-        } catch (error) {
-          console.error('Error adding message:', error);
-          alert('Error adding message.');
+    // -------------------------
+    // Auto scroll
+    // -------------------------
+    function autoScroll(){
+      const chatArea = document.querySelector('.chat-area');
+      chatArea.scrollTop = chatArea.scrollHeight + 200;
+    }
+
+    // -------------------------
+    // Add message (uses POST /wishlist to keep compatibility)
+    // -------------------------
+    async function addItem(){
+      const input = document.getElementById('item');
+      const fileInput = document.getElementById('imageInput');
+      const text = input.value.trim();
+      const reply = JSON.parse(localStorage.getItem('chat_reply') || 'null');
+
+      if(!text && !fileInput.files[0]) return;
+
+      // image upload first if file selected
+      let imageUrl = null;
+      if(fileInput.files[0]){
+        const form = new FormData();
+        form.append('image', fileInput.files[0]);
+        try{
+          const r = await fetch('/upload', { method:'POST', body: form });
+          if(!r.ok) throw new Error('Upload failed');
+          const j = await r.json();
+          imageUrl = j.url;
+        } catch(e){
+          alert('Image upload failed');
+          console.error(e);
         }
       }
-    }
 
-    async function deleteItem(itemId) {
-      try {
-        const response = await fetch(`/wishlist/${itemId}`, {
-          method: 'DELETE'
+      // payload
+      const payload = {
+        name: text || '',
+        username,
+        createdAt: new Date().toISOString(),
+        image: imageUrl || null,
+        replyTo: reply ? reply.id : null,
+        replyText: reply ? reply.text : null
+      };
+
+      try{
+        const res = await fetch('/wishlist', {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(payload)
         });
-        if (!response.ok) throw new Error('Failed to delete message.');
-        await fetchWishlist();
-      } catch (error) {
-        console.error('Error deleting message:', error);
-        alert('Error deleting message.');
+        if(!res.ok) throw new Error('Failed to add message.');
+        // clear
+        input.value = '';
+        fileInput.value = '';
+        input.placeholder = 'Type your message...';
+        localStorage.removeItem('chat_reply');
+        // fetchWishlist(); // socket will update
+      } catch(err){
+        alert('Error adding message.');
+        console.error(err);
       }
     }
 
-    function copyText(text) {
-      navigator.clipboard.writeText(text)
-        .catch(err => console.error('Error copying text:', err));
-    }
-
-    // Real-time clock function
-    function updateClock() {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      document.getElementById('realTimeClock').textContent = `${hours}:${minutes}:${seconds}`;
-    }
-
-    // Online users tracking with 5-second refresh
-    function updateOnlineCounter(count) {
-      document.getElementById('onlineUsers').textContent = `Online: ${count}`;
-    }
-    
-    async function fetchOnlineUsers() {
-      try {
-        const response = await fetch('/online-users');
-        if (response.ok) {
-          const data = await response.json();
-          updateOnlineCounter(data.count);
-        }
-      } catch (error) {
-        console.error('Error fetching online users:', error);
-      }
-    }
-    
-    function initOnlineTracking() {
-      // Initial fetch
-      fetchOnlineUsers();
-      // Set up 5-second refresh
-      setInterval(fetchOnlineUsers, 5000);
-      
-      // Send heartbeat on activity
-      ['mousemove', 'keydown', 'click', 'scroll'].forEach(event => {
-        document.addEventListener(event, () => {
-          fetch('/heartbeat', { method: 'POST' });
-        });
-      });
-    }
-
-    // Initialize everything
-    window.addEventListener('DOMContentLoaded', () => {
-      fetchWishlist();
-      updateClock();
-      setInterval(updateClock, 1000);
-      initOnlineTracking();
+    // -------------------------
+    // Socket event handlers
+    // -------------------------
+    socket.on('connect', () => {
+      socket.emit('hello', { username });
     });
 
-    document.getElementById('addButton').addEventListener('click', addItem);
-    document.getElementById('item').addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        addItem();
+    socket.on('online-count', data => {
+      onlineEl.textContent = 'Online: ' + data.count;
+    });
+
+    socket.on('newMessage', msg => {
+      // append new message
+      wishlistList.insertAdjacentElement('beforeend', createListItem(msg));
+      autoScroll();
+    });
+
+    socket.on('initialMessages', msgs => {
+      wishlistList.innerHTML = '';
+      msgs.forEach(m => wishlistList.appendChild(createListItem(m)));
+      autoScroll();
+    });
+
+    socket.on('messageEdited', msg => {
+      const node = wishlistList.querySelector(`[data-id="${msg._id}"]`);
+      if(node){
+        const newNode = createListItem(msg);
+        wishlistList.replaceChild(newNode, node);
       }
+    });
+
+    socket.on('messageDeleted', id => {
+      const node = wishlistList.querySelector(`[data-id="${id}"]`);
+      if(node) node.remove();
+    });
+
+    socket.on('reactUpdated', msg => {
+      const node = wishlistList.querySelector(`[data-id="${msg._id}"]`);
+      if(node){
+        const newNode = createListItem(msg);
+        wishlistList.replaceChild(newNode, node);
+      }
+    });
+
+    socket.on('typing', data => {
+      if(data.username && data.username !== username){
+        typingIndicator.style.display = 'block';
+        typingIndicator.textContent = data.username + ' is typing…';
+        setTimeout(()=> {
+          typingIndicator.style.display = 'none';
+        }, 2500);
+      }
+    });
+
+    // -------------------------
+    // Typing events (emit)
+    // -------------------------
+    let typingTimer;
+    document.getElementById('item').addEventListener('input', () => {
+      socket.emit('typing', { username });
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(()=> socket.emit('stopTyping', { username }), 2500);
+    });
+
+    // -------------------------
+    // Emoji picker
+    // -------------------------
+    const emojiToggle = document.getElementById('emojiToggle');
+    const emojiPanel = document.getElementById('emojiPanel');
+    emojiToggle.addEventListener('click', () => emojiPanel.style.display = emojiPanel.style.display === 'none' ? 'flex' : 'none');
+    emojiPanel.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      const input = document.getElementById('item');
+      input.value += b.textContent;
+      input.focus();
+    }));
+
+    // attach file
+    document.getElementById('attachBtn').addEventListener('click', () => document.getElementById('imageInput').click());
+    document.getElementById('imageInput').addEventListener('change', (e) => {
+      // show small preview in input placeholder if file exists
+      if(e.target.files && e.target.files[0]){
+        document.getElementById('item').placeholder = 'Image ready to send. Add text or press Send.';
+      }
+    });
+
+    // send
+    document.getElementById('addButton').addEventListener('click', addItem);
+    document.getElementById('item').addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); addItem(); }
+    });
+
+    // clock
+    function updateClock(){
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2,'0');
+      const mm = String(now.getMinutes()).padStart(2,'0');
+      const ss = String(now.getSeconds()).padStart(2,'0');
+      clockEl.textContent = `${hh}:${mm}:${ss}`;
+    }
+    updateClock(); setInterval(updateClock, 1000);
+
+    // initial load (fallback to REST if sockets not yet ready)
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchWishlist();
+      // notify server (via existing heartbeat) to mark this client active
+      fetch('/heartbeat', { method: 'POST' }).catch(()=>{});
     });
   </script>
 </body>
