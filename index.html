@@ -62,10 +62,13 @@
       gap: 5px;
     }
     .bubble img { max-width: 150px; border-radius: 15px; margin-top: 5px; }
+    video { max-width: 200px; border-radius: 15px; margin-top: 5px; }
+
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
     .input-container {
       position: fixed;
       bottom: 0;
@@ -114,13 +117,13 @@
 
   <div class="input-container">
     <input type="text" id="item" placeholder="Type your message...">
-    <input type="file" id="fileInput" accept="image/*">
+    <input type="file" id="fileInput">
     <button id="addButton">Send</button>
   </div>
 
 <script>
-const CLOUD_NAME = "drokorpop"; // غيرها باسم Cloud Name بتاعك
-const UPLOAD_PRESET = "secret_chat_upload"; // اسم الـ preset اللي عاملته
+const CLOUD_NAME = "drokorpop";
+const UPLOAD_PRESET = "secret_chat_upload";
 
 function formatDate(d){ return new Date(d).toLocaleString(); }
 
@@ -129,20 +132,64 @@ function createBubble(item){
   const bubble = document.createElement("div");
   bubble.className = "bubble them";
 
-  let content = `<div>${item.name}</div>`;
-  if(item.imageUrl) content += `<img src="${item.imageUrl}" alt="uploaded image">`;
-  content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>`;
-  content += `<div style="text-align:right;margin-top:3px;">
-      <button onclick="copyText('${item.name.replace(/'/g,"&#39;")}')">📋</button>
+  let content = `<div>${item.name || ""}</div>`;
+
+  // IMAGE
+  if(item.imageUrl){
+    content += `
+      <img src="${item.imageUrl}" alt="">
+      <a href="${item.imageUrl}" download
+         style="display:inline-block;margin-top:5px;color:#4a90e2;font-size:0.9rem;">
+         ⬇️ Download Image
+      </a>
+    `;
+  }
+
+  // VIDEO
+  if(item.videoUrl){
+    content += `
+      <video controls>
+        <source src="${item.videoUrl}">
+      </video>
+      <a href="${item.videoUrl}" download
+         style="display:inline-block;margin-top:5px;color:#4a90e2;font-size:0.9rem;">
+         ⬇️ Download Video
+      </a>
+    `;
+  }
+
+  // FILE
+  if(item.fileUrl){
+    content += `
+      <a href="${item.fileUrl}" target="_blank"
+         style="display:block;margin-top:8px;color:#4a90e2;font-size:1rem;">
+        📄 Open File
+      </a>
+      <a href="${item.fileUrl}" download
+         style="display:inline-block;margin-top:5px;color:#4a90e2;font-size:0.9rem;">
+         ⬇️ Download File
+      </a>
+    `;
+  }
+
+  content += `
+    <small style="font-size:0.7rem;color:#666;">
+      ${formatDate(item.createdAt)}
+    </small>
+
+    <div style="text-align:right;margin-top:3px;">
+      <button onclick="copyText('${item.name?.replace(/'/g,"&#39;") || ""}')">📋</button>
       <button onclick="deleteItem('${item._id}')">❌</button>
-  </div>`;
+    </div>
+  `;
 
   bubble.innerHTML = content;
   li.appendChild(bubble);
   return li;
 }
 
-// FETCH MESSAGES
+
+// FETCH
 async function fetchWishlist(){
   try {
     const res = await fetch('/wishlist');
@@ -154,61 +201,74 @@ async function fetchWishlist(){
   } catch(e){ console.error(e); }
 }
 
-// UPLOAD IMAGE TO CLOUDINARY
-async function uploadImage(file){
+
+// UPLOAD FILE TO CLOUDINARY
+async function uploadFile(file){
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", UPLOAD_PRESET);
 
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
-    method: "POST",
-    body: formData
-  });
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
+
+  const res = await fetch(uploadUrl, { method: "POST", body: formData });
   const data = await res.json();
   return data.secure_url;
 }
+
 
 // ADD MESSAGE
 async function addItem(){
   const input = document.getElementById('item');
   const fileInput = document.getElementById('fileInput');
   const text = input.value.trim();
-  let imageUrl = null;
+  let imageUrl = null, videoUrl = null, fileUrl = null;
 
-  if(fileInput.files.length>0){
-    try {
-      imageUrl = await uploadImage(fileInput.files[0]);
-      fileInput.value = "";
-    } catch(e){ alert("Failed to upload image"); console.error(e); return; }
+  if(fileInput.files.length > 0){
+    const file = fileInput.files[0];
+    const url = await uploadFile(file);
+
+    if(file.type.startsWith("image")) imageUrl = url;
+    else if(file.type.startsWith("video")) videoUrl = url;
+    else fileUrl = url;
   }
 
-  if(!text && !imageUrl) return;
+  if(!text && !imageUrl && !videoUrl && !fileUrl) return;
 
-  try {
-    await fetch('/wishlist',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({name:text, imageUrl, createdAt:new Date().toISOString()})
-    });
-  } catch(e){ console.error(e); }
+  await fetch('/wishlist',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      name:text,
+      imageUrl,
+      videoUrl,
+      fileUrl,
+      createdAt:new Date().toISOString()
+    })
+  });
 
   input.value='';
+  fileInput.value="";
   fetchWishlist();
 }
 
+
 // DELETE
 async function deleteItem(id){
-  try {
-    await fetch(`/wishlist/${id}`,{method:'DELETE'});
-    fetchWishlist();
-  } catch(e){ console.error(e); }
+  await fetch(`/wishlist/${id}`,{method:'DELETE'});
+  fetchWishlist();
 }
+
 
 // COPY
 function copyText(t){ navigator.clipboard.writeText(t); }
 
+
 // CLOCK
-setInterval(()=>{ const n=new Date(); document.getElementById('realTimeClock').textContent = n.toLocaleTimeString(); },1000);
+setInterval(()=>{ 
+  document.getElementById('realTimeClock').textContent =
+    new Date().toLocaleTimeString(); 
+},1000);
+
 
 // ONLINE USERS
 setInterval(async()=>{
@@ -216,21 +276,26 @@ setInterval(async()=>{
     const r = await fetch('/online-users');
     const d = await r.json();
     document.getElementById('onlineUsers').textContent=`Online: ${d.count}`;
-  } catch(e){ console.error(e); }
+  } catch(e){ }
 },3000);
+
 
 // HEARTBEAT
 ['click','keydown','mousemove'].forEach(e=>{
   document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); });
 });
 
-// TYPING INDICATOR
+
+// TYPING
 let typingTimeout;
 document.getElementById('item').addEventListener('input',()=>{
   document.getElementById('typingIndicator').style.display='block';
   clearTimeout(typingTimeout);
-  typingTimeout=setTimeout(()=>{document.getElementById('typingIndicator').style.display='none';},1000);
+  typingTimeout=setTimeout(()=>{
+    document.getElementById('typingIndicator').style.display='none';
+  },1000);
 });
+
 
 // INIT
 fetchWishlist();
