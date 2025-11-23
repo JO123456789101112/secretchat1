@@ -140,6 +140,7 @@
     /* ==========================
        🔐 PIN SYSTEM
     ========================== */
+
     #lockScreen {
       position: fixed;
       top: 0; left: 0;
@@ -202,6 +203,7 @@
     /* ==========================
        🔄 REFRESH BUTTON
     ========================== */
+
     #refreshBtn {
       position: fixed;
       top: 70px;
@@ -226,6 +228,7 @@
     /* ==========================
        🎉 WELCOME BOSS ANIMATION
     ========================== */
+
     #welcomeBoss {
       position: fixed;
       top: 50%;
@@ -245,10 +248,12 @@
     .welcomePart {
       opacity: 0;
     }
+
     .welcomePart.left {
       transform: translateX(-100%);
       animation: slideInLeft 0.5s forwards;
     }
+
     .welcomePart.right {
       transform: translateX(100%);
       animation: slideInRight 0.5s forwards;
@@ -260,6 +265,7 @@
     @keyframes slideInRight {
       to { transform: translateX(0); opacity: 1; }
     }
+
   </style>
 </head>
 
@@ -302,6 +308,7 @@
 <header>john secret chat💭</header>
 <div id="typingIndicator">● Someone is typing...</div>
 
+<!-- Floating Refresh -->
 <button id="refreshBtn">🔄 Refresh</button>
 
 <div class="chat-area" id="wishlist">
@@ -312,6 +319,7 @@
   <label class="file-label">📎
     <input type="file" id="fileInput">
   </label>
+
   <input type="text" id="item" placeholder="Type your message...">
   <button id="addButton">Send</button>
 </div>
@@ -325,47 +333,51 @@ const lockScreen = document.getElementById("lockScreen");
 
 document.querySelectorAll(".pinBtn").forEach(btn => {
   btn.onclick = () => {
-    if(btn.id === 'welBoss') return; // skip welcome button
-    if(typedPIN.length < 5 && !isNaN(btn.textContent)) {
+    if(btn.id === 'welBoss') return; // skip for welcome button
+    if(typedPIN.length < 5 && btn.textContent !== "⌫") {
       typedPIN += btn.textContent;
       pinBoxes[typedPIN.length - 1].value = "•";
     }
-    if(btn.id === 'pinDelete') return;
+    if(btn.id === 'pinDelete') {
+      if(typedPIN.length > 0) {
+        typedPIN = typedPIN.slice(0, -1);
+        pinBoxes[typedPIN.length].value = '';
+      }
+    }
     if(typedPIN.length === 5) {
-      if(typedPIN === CORRECT_PIN) lockScreen.style.display = "none";
-      else {
+      if(typedPIN === CORRECT_PIN) {
+        lockScreen.style.display = "none";
+      } else {
         pinBoxes.forEach(b => b.classList.add("shake"));
-        setTimeout(()=>{ pinBoxes.forEach(b => { b.value=""; b.classList.remove("shake"); }); typedPIN=""; }, 300);
+        setTimeout(() => {
+          pinBoxes.forEach(b => { b.value=""; b.classList.remove("shake"); });
+          typedPIN="";
+        }, 300);
       }
     }
   };
 });
 
-document.getElementById('pinDelete').onclick = () => {
-  if(typedPIN.length>0) {
-    typedPIN = typedPIN.slice(0,-1);
-    pinBoxes[typedPIN.length].value = '';
-  }
-};
-
 /* 🎉 WELCOME BOSS BUTTON */
 document.getElementById('welBoss').onclick = () => {
+  if(document.getElementById('welcomeBoss')) return;
   const welcome = document.createElement('div');
   welcome.id = 'welcomeBoss';
-
   const left = document.createElement('span');
   left.className = 'welcomePart left';
   left.textContent = 'Welcome';
-
   const right = document.createElement('span');
   right.className = 'welcomePart right';
   right.textContent = 'Boss John';
-
   welcome.appendChild(left);
   welcome.appendChild(right);
   document.body.appendChild(welcome);
-
-  setTimeout(()=>{ welcome.remove(); }, 2000);
+  welcome.style.opacity = 1;
+  setTimeout(()=>{
+    welcome.style.transition = "opacity 0.5s";
+    welcome.style.opacity = 0;
+    setTimeout(()=> welcome.remove(), 500);
+  }, 2000);
 };
 
 /* ======================
@@ -381,12 +393,21 @@ function createBubble(item){
   const bubble = document.createElement("div");
   bubble.className = "bubble them";
   let content = `<div>${item.name || ""}</div>`;
-  if(item.imageUrl){ content += `<img src="${item.imageUrl}" alt=""><a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`; }
-  if(item.videoUrl){ content += `<video controls><source src="${item.videoUrl}"></video><a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`; }
-  if(item.fileUrl){ content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`; }
+  if(item.imageUrl){
+    content += `<img src="${item.imageUrl}" alt="">
+      <a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
+  }
+  if(item.videoUrl){
+    content += `<video controls><source src="${item.videoUrl}"></video>
+      <a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
+  }
+  if(item.fileUrl){
+    content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a>
+      <a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
+  }
   content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
     <div style="text-align:right;">
-      <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
+      <button onclick="copyText('${item.name?.replace(/'/g,"&#39;") || ""}')">📋</button>
       <button onclick="deleteItem('${item._id}')">❌</button>
     </div>`;
   bubble.innerHTML = content;
@@ -394,7 +415,10 @@ function createBubble(item){
   return li;
 }
 
-function noScrollDown() { document.querySelector(".chat-area").scrollTo({ top: 0, behavior: 'smooth' }); }
+function noScrollDown() {
+  const chat = document.querySelector(".chat-area");
+  chat.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 async function fetchWishlist(){
   try {
