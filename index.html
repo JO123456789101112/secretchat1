@@ -243,6 +243,14 @@
 
   <header>john secret chat💭</header>
   <div id="typingIndicator">● Someone is typing...</div>
+  <button id="refreshBtn" style="
+  position: fixed; top: 70px; right: 20px; 
+  padding: 10px 15px; 
+  background: #4a90e2; color: white; 
+  border: none; border-radius: 10px;
+  cursor: pointer; z-index: 50;
+">🔄 Refresh</button>
+
 
   <div class="chat-area" id="wishlist">
     <ul id="wishlistList"></ul>
@@ -441,6 +449,10 @@ document.getElementById('item').addEventListener('input',()=>{
 fetchWishlist();
 document.getElementById('addButton').onclick=addItem;
 document.getElementById('item').onkeydown=(e)=>{ if(e.key==='Enter') addItem(); };
+document.getElementById('refreshBtn').onclick = () => {
+  fetchWishlist();
+};
+
 </script>
 
 </body>
