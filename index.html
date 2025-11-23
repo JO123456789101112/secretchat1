@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>My chat💭 ـِJAW </title>
+  <title>My chat💭 JAW </title>
 
   <style>
     * { box-sizing: border-box; }
@@ -137,10 +137,9 @@
       display: none;
     }
 
-
-    /* ============================
-         🔐 PIN SYSTEM ADDED
-    ============================ */
+    /* ==========================
+       🔐 PIN SYSTEM
+    ========================== */
 
     #lockScreen {
       position: fixed;
@@ -201,6 +200,31 @@
       100% { transform: translateX(0); }
     }
 
+    /* ==========================
+       🔄 REFRESH BUTTON
+    ========================== */
+
+    #refreshBtn {
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      padding: 10px 15px;
+      background: linear-gradient(90deg, #4a90e2, #6aa8ff);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 50;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: 0.3s;
+    }
+
+    #refreshBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
   </style>
 </head>
 
@@ -237,39 +261,30 @@
 </div>
 <!-- END LOCK SCREEN -->
 
+<div class="real-time-clock" id="realTimeClock"></div>
+<div class="online-users" id="onlineUsers">Online: 0</div>
 
-  <div class="real-time-clock" id="realTimeClock"></div>
-  <div class="online-users" id="onlineUsers">Online: 0</div>
+<header>john secret chat💭</header>
+<div id="typingIndicator">● Someone is typing...</div>
 
-  <header>john secret chat💭</header>
-  <div id="typingIndicator">● Someone is typing...</div>
-  <button id="refreshBtn" style="
-  position: fixed; top: 70px; right: 20px; 
-  padding: 10px 15px; 
-  background: #4a90e2; color: white; 
-  border: none; border-radius: 10px;
-  cursor: pointer; z-index: 50;
-">🔄 Refresh</button>
+<!-- Floating Refresh -->
+<button id="refreshBtn">🔄 Refresh</button>
 
+<div class="chat-area" id="wishlist">
+  <ul id="wishlistList"></ul>
+</div>
 
-  <div class="chat-area" id="wishlist">
-    <ul id="wishlistList"></ul>
-  </div>
+<div class="input-container">
+  <label class="file-label">📎
+    <input type="file" id="fileInput">
+  </label>
 
-  <div class="input-container">
-    <label class="file-label">
-      📎
-      <input type="file" id="fileInput">
-    </label>
-
-    <input type="text" id="item" placeholder="Type your message...">
-    <button id="addButton">Send</button>
-  </div>
+  <input type="text" id="item" placeholder="Type your message...">
+  <button id="addButton">Send</button>
+</div>
 
 <script>
-/* ======================================
-       🔐 PIN SYSTEM LOGIC ADDED
-====================================== */
+/* 🔐 PIN SYSTEM */
 const CORRECT_PIN = "10110";
 let typedPIN = "";
 
@@ -282,28 +297,23 @@ document.querySelectorAll(".pinBtn").forEach(btn => {
       typedPIN += btn.textContent;
       pinBoxes[typedPIN.length - 1].value = "•";
     }
-
     if (typedPIN.length === 5) {
       if (typedPIN === CORRECT_PIN) {
         lockScreen.style.display = "none";
       } else {
-        // wrong PIN → shake + clear
         pinBoxes.forEach(b => b.classList.add("shake"));
         setTimeout(() => {
-          pinBoxes.forEach(b => { b.value = ""; b.classList.remove("shake"); });
-          typedPIN = "";
+          pinBoxes.forEach(b => { b.value=""; b.classList.remove("shake"); });
+          typedPIN="";
         }, 300);
       }
     }
   };
 });
 
-
-/* ======================================
-        ORIGINAL CHAT SCRIPT
-   (Nothing deleted or edited)
-====================================== */
-
+/* ======================
+       CHAT SCRIPT
+====================== */
 const CLOUD_NAME = "drokorpop";
 const UPLOAD_PRESET = "secret_chat_upload";
 
@@ -313,40 +323,24 @@ function createBubble(item){
   const li = document.createElement("li");
   const bubble = document.createElement("div");
   bubble.className = "bubble them";
-
   let content = `<div>${item.name || ""}</div>`;
-
   if(item.imageUrl){
-    content += `
-      <img src="${item.imageUrl}" alt="">
-      <a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>
-    `;
+    content += `<img src="${item.imageUrl}" alt="">
+      <a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
   }
-
   if(item.videoUrl){
-    content += `
-      <video controls>
-        <source src="${item.videoUrl}">
-      </video>
-      <a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>
-    `;
+    content += `<video controls><source src="${item.videoUrl}"></video>
+      <a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
   }
-
   if(item.fileUrl){
-    content += `
-      <a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a>
-      <a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>
-    `;
+    content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a>
+      <a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
   }
-
-  content += `
-    <small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
+  content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
     <div style="text-align:right;">
       <button onclick="copyText('${item.name?.replace(/'/g,"&#39;") || ""}')">📋</button>
       <button onclick="deleteItem('${item._id}')">❌</button>
-    </div>
-  `;
-
+    </div>`;
   bubble.innerHTML = content;
   li.appendChild(bubble);
   return li;
@@ -354,7 +348,7 @@ function createBubble(item){
 
 function noScrollDown() {
   const chat = document.querySelector(".chat-area");
-  chat.scrollTop = 0;
+  chat.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function fetchWishlist(){
@@ -362,7 +356,7 @@ async function fetchWishlist(){
     const res = await fetch('/wishlist');
     const data = await res.json();
     const list = document.getElementById('wishlistList');
-    list.innerHTML = '';
+    list.innerHTML='';
     data.forEach(msg => list.appendChild(createBubble(msg)));
     noScrollDown();
   } catch(e){ console.error(e); }
@@ -372,9 +366,7 @@ async function uploadFile(file){
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", UPLOAD_PRESET);
-
   const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
-
   const res = await fetch(uploadUrl, { method: "POST", body: formData });
   const data = await res.json();
   return data.secure_url;
@@ -384,30 +376,20 @@ async function addItem(){
   const input = document.getElementById('item');
   const fileInput = document.getElementById('fileInput');
   const text = input.value.trim();
-  let imageUrl = null, videoUrl = null, fileUrl = null;
-
-  if(fileInput.files.length > 0){
+  let imageUrl=null, videoUrl=null, fileUrl=null;
+  if(fileInput.files.length>0){
     const file = fileInput.files[0];
     const url = await uploadFile(file);
-    if(file.type.startsWith("image")) imageUrl = url;
-    else if(file.type.startsWith("video")) videoUrl = url;
-    else fileUrl = url;
+    if(file.type.startsWith("image")) imageUrl=url;
+    else if(file.type.startsWith("video")) videoUrl=url;
+    else fileUrl=url;
   }
-
   if(!text && !imageUrl && !videoUrl && !fileUrl) return;
-
   await fetch('/wishlist',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      name:text,
-      imageUrl,
-      videoUrl,
-      fileUrl,
-      createdAt:new Date().toISOString()
-    })
+    body:JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})
   });
-
   input.value='';
   fileInput.value="";
   fetchWishlist();
@@ -420,10 +402,7 @@ async function deleteItem(id){
 
 function copyText(t){ navigator.clipboard.writeText(t); }
 
-setInterval(()=>{ 
-  document.getElementById('realTimeClock').textContent =
-    new Date().toLocaleTimeString(); 
-},1000);
+setInterval(()=>{ document.getElementById('realTimeClock').textContent = new Date().toLocaleTimeString(); },1000);
 
 setInterval(async()=>{
   try {
@@ -433,26 +412,26 @@ setInterval(async()=>{
   } catch(e){ }
 },3000);
 
-['click','keydown','mousemove'].forEach(e=>{
-  document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); });
-});
+['click','keydown','mousemove'].forEach(e=>{ document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); }); });
 
 let typingTimeout;
 document.getElementById('item').addEventListener('input',()=>{
   document.getElementById('typingIndicator').style.display='block';
   clearTimeout(typingTimeout);
-  typingTimeout=setTimeout(()=>{
-    document.getElementById('typingIndicator').style.display='none';
-  },1000);
+  typingTimeout=setTimeout(()=>{ document.getElementById('typingIndicator').style.display='none'; },1000);
 });
 
 fetchWishlist();
 document.getElementById('addButton').onclick=addItem;
 document.getElementById('item').onkeydown=(e)=>{ if(e.key==='Enter') addItem(); };
-document.getElementById('refreshBtn').onclick = () => {
-  fetchWishlist();
-};
 
+/* 🔄 REFRESH BUTTON */
+document.getElementById('refreshBtn').onclick = async () => {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  await fetchWishlist();
+  btn.disabled = false;
+};
 </script>
 
 </body>
