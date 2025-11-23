@@ -170,6 +170,7 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
     <button class="pinBtn">7</button>
     <button class="pinBtn">8</button>
     <button class="pinBtn">9</button>
+    <button class="pinBtn" id="welBoss">👑</button>
     <button class="pinBtn">0</button>
     <button class="pinBtn" id="pinDelete">⌫</button>
   </div>
@@ -207,7 +208,7 @@ document.querySelectorAll(".pinBtn").forEach(btn=>{
     if(/\d/.test(val)){
       if(typedPIN.length<5){ typedPIN+=val; pinBoxes[typedPIN.length-1].value="•"; }
       if(typedPIN.length===5){
-        if(typedPIN===CORRECT_PIN){ triggerWelcome(); }
+        if(typedPIN===CORRECT_PIN){ lockScreen.style.display="none"; }
         else{ pinBoxes.forEach(b=>b.classList.add("shake"));
           setTimeout(()=>{ pinBoxes.forEach(b=>{b.value=""; b.classList.remove("shake");}); typedPIN=""; },300);
         }
@@ -220,13 +221,11 @@ document.getElementById("pinDelete").onclick=()=>{
   if(typedPIN.length>0){ typedPIN=typedPIN.slice(0,-1); pinBoxes[typedPIN.length].value=""; }
 };
 
-/* ===================== CELEBRATION FUNCTION ===================== */
-function triggerWelcome(){
-  lockScreen.style.display="none";
-  const msg=document.getElementById("welcomeMsg");
-  msg.style.opacity="1";
+/* ===================== WELCOME BOSS PARTY ===================== */
+document.getElementById("welBoss").onclick = () => {
+  const msg = document.getElementById("welcomeMsg");
+  msg.style.opacity = "1";
 
-  // create confetti
   for(let i=0;i<50;i++){
     const conf=document.createElement("div");
     conf.className="confetti-piece";
@@ -237,16 +236,14 @@ function triggerWelcome(){
     setTimeout(()=>conf.remove(),3000);
   }
 
-  msg.style.animation="fadeOut 3s forwards";
-  setTimeout(()=>msg.style.opacity="0",3000);
-}
+  setTimeout(()=>{ msg.style.opacity="0"; },3000);
+};
 
 /* ===================== CHAT FUNCTIONS ===================== */
 const CLOUD_NAME = "drokorpop";
 const UPLOAD_PRESET = "secret_chat_upload";
 
 function formatDate(d){ return new Date(d).toLocaleString(); }
-
 function createBubble(item){
   const li=document.createElement("li");
   const bubble=document.createElement("div");
@@ -262,7 +259,6 @@ function createBubble(item){
     </div>`;
   bubble.innerHTML=content; li.appendChild(bubble); return li;
 }
-
 function noScrollDown(){ document.querySelector(".chat-area").scrollTo({ top:0, behavior:'smooth'}); }
 
 async function fetchWishlist(){
@@ -272,7 +268,6 @@ async function fetchWishlist(){
     noScrollDown();
   }catch(e){ console.error(e); }
 }
-
 async function uploadFile(file){
   const formData=new FormData();
   formData.append("file",file);
@@ -281,7 +276,6 @@ async function uploadFile(file){
   const res=await fetch(uploadUrl,{method:"POST",body:formData});
   const data=await res.json(); return data.secure_url;
 }
-
 async function addItem(){
   const input=document.getElementById('item');
   const fileInput=document.getElementById('fileInput');
@@ -297,7 +291,6 @@ async function addItem(){
   await fetch('/wishlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})});
   input.value=''; fileInput.value=""; fetchWishlist();
 }
-
 async function deleteItem(id){ await fetch(`/wishlist/${id}`,{method:'DELETE'}); fetchWishlist(); }
 function copyText(t){ navigator.clipboard.writeText(t); }
 
