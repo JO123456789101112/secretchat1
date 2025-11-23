@@ -220,11 +220,11 @@ video { max-width: 200px; border-radius: 15px; margin-top: 5px; }
 #refreshBtn:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
 
 /* ==========================
-   💬 WELCOME ANIMATION
+   💬 CINEMATIC WELCOME
 ========================== */
 #welcomeMsg {
   position: fixed;
-  top: 40%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 2rem;
@@ -236,10 +236,38 @@ video { max-width: 200px; border-radius: 15px; margin-top: 5px; }
   pointer-events: none;
   white-space: nowrap;
 }
-@keyframes welcomeAnim {
-  0% { transform: translate(-200%, -50%); opacity: 0; }
-  50% { transform: translate(0%, -50%); opacity: 1; }
-  100% { transform: translate(200%, -50%); opacity: 0; }
+
+#welcomePanelLeft, #welcomePanelRight {
+  position: fixed;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background: #4a90e2;
+  z-index: 99998;
+  transform: translateX(0);
+  pointer-events: none;
+}
+
+#welcomePanelLeft { left: -50%; }
+#welcomePanelRight { right: -50%; }
+
+@keyframes slidePanels {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(50%); }
+  60% { transform: translateX(50%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes slidePanelsRight {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-50%); }
+  60% { transform: translateX(-50%); }
+  100% { transform: translateX(-100%); }
+}
+@keyframes fadeText {
+  0% { opacity: 0; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(0); }
+  70% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(0); }
 }
 </style>
 </head>
@@ -276,6 +304,8 @@ video { max-width: 200px; border-radius: 15px; margin-top: 5px; }
 </div>
 
 <div id="welcomeMsg">Welcome Boss John!</div>
+<div id="welcomePanelLeft"></div>
+<div id="welcomePanelRight"></div>
 
 <div class="real-time-clock" id="realTimeClock"></div>
 <div class="online-users" id="onlineUsers">Online: 0</div>
@@ -305,8 +335,8 @@ const pinBoxes = document.querySelectorAll(".pinBox");
 const lockScreen = document.getElementById("lockScreen");
 
 document.querySelectorAll(".pinBtn").forEach(btn => {
+  const val = btn.textContent;
   btn.onclick = () => {
-    const val = btn.textContent;
     if(val === "0" || /\d/.test(val)) {
       if (typedPIN.length < 5) {
         typedPIN += val;
@@ -331,13 +361,16 @@ document.getElementById("pinDelete").onclick = () => {
 };
 
 /* ==========================
-   💬 WELCOME BOSS
+   💬 CINEMATIC WELCOME
 ========================== */
 document.getElementById("welBoss").onclick = () => {
+  const left = document.getElementById("welcomePanelLeft");
+  const right = document.getElementById("welcomePanelRight");
   const msg = document.getElementById("welcomeMsg");
-  msg.style.animation = "none";
-  void msg.offsetWidth; // restart animation
-  msg.style.animation = "2s ease forwards welcomeAnim";
+
+  left.style.animation = "slidePanels 2s forwards";
+  right.style.animation = "slidePanelsRight 2s forwards";
+  msg.style.animation = "fadeText 2s forwards";
 };
 
 /* ==========================
