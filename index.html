@@ -132,11 +132,16 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 #refreshBtn:hover{ transform:scale(1.05); box-shadow:0 4px 8px rgba(0,0,0,0.4); }
 
 /* ===================== CELEBRATION ===================== */
-#welcomeMsg {
-  position: fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+#welcomeMsgLeft, #welcomeMsgRight {
+  position: fixed; top:50%; transform:translateY(-50%);
   font-size:2rem; font-weight:bold; color:white; text-shadow:0 2px 6px rgba(0,0,0,0.5);
   opacity:0; z-index:99999; pointer-events:none; white-space:nowrap;
 }
+#welcomeMsgLeft { left: -100%; }
+#welcomeMsgRight { right: -100%; }
+@keyframes slideFromLeft { 0%{left:-100%;opacity:0;}50%{left:50%;opacity:1;}100%{left:-100%;opacity:0;} }
+@keyframes slideFromRight { 0%{right:-100%;opacity:0;}50%{right:50%;opacity:1;}100%{right:-100%;opacity:0;} }
+
 .confetti-piece {
   position: fixed; width:10px; height:10px; background:red;
   top:0; left:50%; opacity:0.9; z-index:99998;
@@ -176,7 +181,8 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
   </div>
 </div>
 
-<div id="welcomeMsg">Welcome Boss John!</div>
+<div id="welcomeMsgLeft">Welcome Boss John!</div>
+<div id="welcomeMsgRight">Welcome Boss John!</div>
 
 <div class="real-time-clock" id="realTimeClock"></div>
 <div class="online-users" id="onlineUsers">Online: 0</div>
@@ -202,14 +208,36 @@ let typedPIN="";
 const pinBoxes=document.querySelectorAll(".pinBox");
 const lockScreen=document.getElementById("lockScreen");
 
+function showWelcomeParty() {
+  // Show welcome messages
+  const left = document.getElementById("welcomeMsgLeft");
+  const right = document.getElementById("welcomeMsgRight");
+  left.style.animation="slideFromLeft 3s forwards";
+  right.style.animation="slideFromRight 3s forwards";
+
+  // Confetti
+  for(let i=0;i<50;i++){
+    const conf=document.createElement("div");
+    conf.className="confetti-piece";
+    conf.style.left=Math.random()*window.innerWidth+"px";
+    conf.style.background=["red","#ff4d4d","#ff0000"][Math.floor(Math.random()*3)];
+    conf.style.animationDuration=2+Math.random()*1+"s";
+    document.body.appendChild(conf);
+    setTimeout(()=>conf.remove(),3000);
+  }
+}
+
 document.querySelectorAll(".pinBtn").forEach(btn=>{
   btn.onclick=()=>{
     const val=btn.textContent;
     if(/\d/.test(val)){
       if(typedPIN.length<5){ typedPIN+=val; pinBoxes[typedPIN.length-1].value="•"; }
       if(typedPIN.length===5){
-        if(typedPIN===CORRECT_PIN){ lockScreen.style.display="none"; }
-        else{ pinBoxes.forEach(b=>b.classList.add("shake"));
+        if(typedPIN===CORRECT_PIN){
+          lockScreen.style.display="none";
+          showWelcomeParty(); // Automatically show party when PIN is correct
+        } else {
+          pinBoxes.forEach(b=>b.classList.add("shake"));
           setTimeout(()=>{ pinBoxes.forEach(b=>{b.value=""; b.classList.remove("shake");}); typedPIN=""; },300);
         }
       }
@@ -221,23 +249,7 @@ document.getElementById("pinDelete").onclick=()=>{
   if(typedPIN.length>0){ typedPIN=typedPIN.slice(0,-1); pinBoxes[typedPIN.length].value=""; }
 };
 
-/* ===================== WELCOME BOSS PARTY ===================== */
-document.getElementById("welBoss").onclick = () => {
-  const msg = document.getElementById("welcomeMsg");
-  msg.style.opacity = "1";
-
-  for(let i=0;i<50;i++){
-    const conf=document.createElement("div");
-    conf.className="confetti-piece";
-    conf.style.left=Math.random()*window.innerWidth+"px";
-    conf.style.background=["red","#ff4d4d","#ff0000"][Math.floor(Math.random()*3)];
-    conf.style.animationDuration=2+Math.random()*1+"s";
-    document.body.appendChild(conf);
-    setTimeout(()=>conf.remove(),3000);
-  }
-
-  setTimeout(()=>{ msg.style.opacity="0"; },3000);
-};
+document.getElementById("welBoss").onclick = ()=>{ showWelcomeParty(); };
 
 /* ===================== CHAT FUNCTIONS ===================== */
 const CLOUD_NAME = "drokorpop";
