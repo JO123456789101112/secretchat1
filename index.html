@@ -175,6 +175,7 @@
       grid-template-columns: repeat(3, 70px);
       gap: 12px;
       margin-top: 10px;
+    
     }
 
     .pinBtn {
@@ -254,12 +255,13 @@
     <button class="pinBtn">7</button>
     <button class="pinBtn">8</button>
     <button class="pinBtn">9</button>
-    <div></div>
+    <button class="pinBtn" id="pinDelete">⌫</button>
     <button class="pinBtn">0</button>
     <div></div>
   </div>
 </div>
 <!-- END LOCK SCREEN -->
+
 
 <div class="real-time-clock" id="realTimeClock"></div>
 <div class="online-users" id="onlineUsers">Online: 0</div>
@@ -432,6 +434,14 @@ document.getElementById('refreshBtn').onclick = async () => {
   await fetchWishlist();
   btn.disabled = false;
 };
+
+document.getElementById('pinDelete').onclick = () => {
+  if (typedPIN.length > 0) {
+    typedPIN = typedPIN.slice(0, -1);
+    pinBoxes[typedPIN.length].value = '';
+  }
+};
+
 </script>
 
 </body>
