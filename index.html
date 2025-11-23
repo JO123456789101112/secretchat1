@@ -140,7 +140,6 @@
     /* ==========================
        🔐 PIN SYSTEM
     ========================== */
-
     #lockScreen {
       position: fixed;
       top: 0; left: 0;
@@ -175,7 +174,6 @@
       grid-template-columns: repeat(3, 70px);
       gap: 12px;
       margin-top: 10px;
-    
     }
 
     .pinBtn {
@@ -204,7 +202,6 @@
     /* ==========================
        🔄 REFRESH BUTTON
     ========================== */
-
     #refreshBtn {
       position: fixed;
       top: 70px;
@@ -226,6 +223,43 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.4);
     }
 
+    /* ==========================
+       🎉 WELCOME BOSS ANIMATION
+    ========================== */
+    #welcomeBoss {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      gap: 20px;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #4a90e2;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .welcomePart {
+      opacity: 0;
+    }
+    .welcomePart.left {
+      transform: translateX(-100%);
+      animation: slideInLeft 0.5s forwards;
+    }
+    .welcomePart.right {
+      transform: translateX(100%);
+      animation: slideInRight 0.5s forwards;
+    }
+
+    @keyframes slideInLeft {
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideInRight {
+      to { transform: translateX(0); opacity: 1; }
+    }
   </style>
 </head>
 
@@ -255,15 +289,12 @@
     <button class="pinBtn">7</button>
     <button class="pinBtn">8</button>
     <button class="pinBtn">9</button>
-    <button class="pinBtn" id="celeprate">⌫</button>
+    <button class="pinBtn" id="welBoss">🎉</button>
     <button class="pinBtn">0</button>
     <button class="pinBtn" id="pinDelete">⌫</button>
-    
-    <div></div>
   </div>
 </div>
 <!-- END LOCK SCREEN -->
-
 
 <div class="real-time-clock" id="realTimeClock"></div>
 <div class="online-users" id="onlineUsers">Online: 0</div>
@@ -271,7 +302,6 @@
 <header>john secret chat💭</header>
 <div id="typingIndicator">● Someone is typing...</div>
 
-<!-- Floating Refresh -->
 <button id="refreshBtn">🔄 Refresh</button>
 
 <div class="chat-area" id="wishlist">
@@ -282,7 +312,6 @@
   <label class="file-label">📎
     <input type="file" id="fileInput">
   </label>
-
   <input type="text" id="item" placeholder="Type your message...">
   <button id="addButton">Send</button>
 </div>
@@ -291,29 +320,53 @@
 /* 🔐 PIN SYSTEM */
 const CORRECT_PIN = "10110";
 let typedPIN = "";
-
 const pinBoxes = document.querySelectorAll(".pinBox");
 const lockScreen = document.getElementById("lockScreen");
 
 document.querySelectorAll(".pinBtn").forEach(btn => {
   btn.onclick = () => {
-    if (typedPIN.length < 5) {
+    if(btn.id === 'welBoss') return; // skip welcome button
+    if(typedPIN.length < 5 && !isNaN(btn.textContent)) {
       typedPIN += btn.textContent;
       pinBoxes[typedPIN.length - 1].value = "•";
     }
-    if (typedPIN.length === 5) {
-      if (typedPIN === CORRECT_PIN) {
-        lockScreen.style.display = "none";
-      } else {
+    if(btn.id === 'pinDelete') return;
+    if(typedPIN.length === 5) {
+      if(typedPIN === CORRECT_PIN) lockScreen.style.display = "none";
+      else {
         pinBoxes.forEach(b => b.classList.add("shake"));
-        setTimeout(() => {
-          pinBoxes.forEach(b => { b.value=""; b.classList.remove("shake"); });
-          typedPIN="";
-        }, 300);
+        setTimeout(()=>{ pinBoxes.forEach(b => { b.value=""; b.classList.remove("shake"); }); typedPIN=""; }, 300);
       }
     }
   };
 });
+
+document.getElementById('pinDelete').onclick = () => {
+  if(typedPIN.length>0) {
+    typedPIN = typedPIN.slice(0,-1);
+    pinBoxes[typedPIN.length].value = '';
+  }
+};
+
+/* 🎉 WELCOME BOSS BUTTON */
+document.getElementById('welBoss').onclick = () => {
+  const welcome = document.createElement('div');
+  welcome.id = 'welcomeBoss';
+
+  const left = document.createElement('span');
+  left.className = 'welcomePart left';
+  left.textContent = 'Welcome';
+
+  const right = document.createElement('span');
+  right.className = 'welcomePart right';
+  right.textContent = 'Boss John';
+
+  welcome.appendChild(left);
+  welcome.appendChild(right);
+  document.body.appendChild(welcome);
+
+  setTimeout(()=>{ welcome.remove(); }, 2000);
+};
 
 /* ======================
        CHAT SCRIPT
@@ -328,21 +381,12 @@ function createBubble(item){
   const bubble = document.createElement("div");
   bubble.className = "bubble them";
   let content = `<div>${item.name || ""}</div>`;
-  if(item.imageUrl){
-    content += `<img src="${item.imageUrl}" alt="">
-      <a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
-  }
-  if(item.videoUrl){
-    content += `<video controls><source src="${item.videoUrl}"></video>
-      <a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
-  }
-  if(item.fileUrl){
-    content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a>
-      <a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
-  }
+  if(item.imageUrl){ content += `<img src="${item.imageUrl}" alt=""><a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`; }
+  if(item.videoUrl){ content += `<video controls><source src="${item.videoUrl}"></video><a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`; }
+  if(item.fileUrl){ content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`; }
   content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
     <div style="text-align:right;">
-      <button onclick="copyText('${item.name?.replace(/'/g,"&#39;") || ""}')">📋</button>
+      <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
       <button onclick="deleteItem('${item._id}')">❌</button>
     </div>`;
   bubble.innerHTML = content;
@@ -350,10 +394,7 @@ function createBubble(item){
   return li;
 }
 
-function noScrollDown() {
-  const chat = document.querySelector(".chat-area");
-  chat.scrollTo({ top: 0, behavior: 'smooth' });
-}
+function noScrollDown() { document.querySelector(".chat-area").scrollTo({ top: 0, behavior: 'smooth' }); }
 
 async function fetchWishlist(){
   try {
@@ -392,7 +433,7 @@ async function addItem(){
   await fetch('/wishlist',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})
+    body: JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})
   });
   input.value='';
   fileInput.value="";
@@ -436,14 +477,6 @@ document.getElementById('refreshBtn').onclick = async () => {
   await fetchWishlist();
   btn.disabled = false;
 };
-
-document.getElementById('pinDelete').onclick = () => {
-  if (typedPIN.length > 0) {
-    typedPIN = typedPIN.slice(0, -1);
-    pinBoxes[typedPIN.length].value = '';
-  }
-};
-
 </script>
 
 </body>
