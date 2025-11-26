@@ -17,7 +17,7 @@ body {
   overflow: hidden;
 }
 
-/* ===================== HEADER ===================== */
+/* HEADER */
 header {
   background: linear-gradient(90deg, #4a90e2, #6aa8ff);
   color: #fff;
@@ -31,7 +31,7 @@ header {
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* ===================== REAL TIME INFO ===================== */
+/* REAL TIME INFO */
 .real-time-clock, .online-users {
   position: fixed;
   top: 15px;
@@ -45,7 +45,7 @@ header {
 .real-time-clock { left: 15px; }
 .online-users { right: 15px; }
 
-/* ===================== CHAT AREA ===================== */
+/* CHAT AREA */
 .chat-area {
   flex: 1;
   margin-top: 60px;
@@ -74,7 +74,7 @@ header {
 video { max-width:200px; border-radius:15px; margin-top:5px; }
 @keyframes slideIn { from {opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
-/* ===================== INPUT ===================== */
+/* INPUT */
 .input-container {
   position: fixed;
   bottom: 0;
@@ -99,7 +99,7 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 }
 #typingIndicator { font-size:0.9rem; color:#777; padding-left:10px; margin-bottom:5px; display:none; }
 
-/* ===================== LOCK SCREEN ===================== */
+/* LOCK SCREEN */
 #lockScreen {
   position: fixed; top:0; left:0;
   width:100%; height:100%;
@@ -121,7 +121,7 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 .shake { animation: shakeAnim 0.3s; }
 @keyframes shakeAnim {0%{transform:translateX(0);}25%{transform:translateX(-6px);}50%{transform:translateX(6px);}75%{transform:translateX(-6px);}100%{transform:translateX(0);}}
 
-/* ===================== REFRESH ===================== */
+/* REFRESH */
 #refreshBtn {
   position: fixed; top:70px; right:20px;
   padding:10px 15px;
@@ -131,7 +131,7 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 }
 #refreshBtn:hover{ transform:scale(1.05); box-shadow:0 4px 8px rgba(0,0,0,0.4); }
 
-/* ===================== CELEBRATION ===================== */
+/* CELEBRATION */
 #welcomeMsgLeft, #welcomeMsgRight {
   position: fixed; top:50%; transform:translateY(-50%);
   font-size:2rem; font-weight:bold; color:white; text-shadow:0 2px 6px rgba(0,0,0,0.5);
@@ -202,7 +202,7 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 </div>
 
 <script>
-/* ===================== PIN SYSTEM ===================== */
+/* PIN SYSTEM */
 const CORRECT_PIN="10110";
 let typedPIN="";
 const pinBoxes=document.querySelectorAll(".pinBox");
@@ -246,7 +246,7 @@ document.querySelectorAll(".pinBtn").forEach(btn=>{
 document.getElementById("pinDelete").onclick=()=>{ if(typedPIN.length>0){ typedPIN=typedPIN.slice(0,-1); pinBoxes[typedPIN.length].value=""; } };
 document.getElementById("welBoss").onclick = ()=>{ showWelcomeParty(); };
 
-/* ===================== CHAT FUNCTIONS ===================== */
+/* CHAT FUNCTIONS */
 const CLOUD_NAME = "drokorpop";
 const UPLOAD_PRESET = "secret_chat_upload";
 
@@ -256,25 +256,18 @@ function createBubble(item){
   const li=document.createElement("li");
   const bubble=document.createElement("div");
   bubble.className="bubble them";
-
   let content=`<div>${item.name||""}</div>`;
 
-  /* ==== IMAGE WITH DOWNLOAD BUTTON ==== */
   if(item.imageUrl){
-    const downloadImgUrl = item.imageUrl.replace('/upload/', '/upload/fl_attachment:download/');
-    content += `<img src="${item.imageUrl}"><a href="${downloadImgUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
+    content += `<img src="${item.imageUrl}"><a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
   }
-
-  /* ==== VIDEO WITH DOWNLOAD BUTTON ==== */
   if(item.videoUrl){
-    const downloadVideoUrl = item.videoUrl.replace('/upload/', '/upload/fl_attachment:download/');
-    content += `<video controls><source src="${item.videoUrl}"></video><a href="${downloadVideoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
+    content += `<video controls><source src="${item.videoUrl}"></video><a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
   }
-
-  /* ==== FILE WITH OPEN + DOWNLOAD ==== */
   if(item.fileUrl){
-    const downloadFileUrl = item.fileUrl.replace('/upload/', '/upload/fl_attachment:download/');
-    content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br><a href="${downloadFileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
+    // الحل للملفات العادية: remove ?fl_attachment و استخدم download فقط
+    content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>
+                <a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
   }
 
   content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
@@ -307,8 +300,7 @@ async function uploadFile(file){
   formData.append("upload_preset",UPLOAD_PRESET);
   const uploadUrl=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
   const res=await fetch(uploadUrl,{method:"POST",body:formData});
-  const data=await res.json(); 
-  return data.secure_url;
+  const data=await res.json(); return data.secure_url;
 }
 
 async function addItem(){
@@ -320,6 +312,7 @@ async function addItem(){
   if(fileInput.files.length>0){
     const file=fileInput.files[0]; 
     const url=await uploadFile(file);
+
     if(file.type.startsWith("image")) imageUrl=url;
     else if(file.type.startsWith("video")) videoUrl=url;
     else fileUrl=url;
@@ -330,56 +323,39 @@ async function addItem(){
   await fetch('/wishlist',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      name:text,imageUrl,videoUrl,fileUrl,
-      createdAt:new Date().toISOString()
-    })
+    body:JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})
   });
 
-  input.value=''; 
-  fileInput.value="";
-  fetchWishlist();
+  input.value=''; fileInput.value=""; fetchWishlist();
 }
 
-async function deleteItem(id){
-  await fetch(`/wishlist/${id}`,{method:'DELETE'});
-  fetchWishlist();
-}
-
+async function deleteItem(id){ await fetch(`/wishlist/${id}`,{method:'DELETE'}); fetchWishlist(); }
 function copyText(t){ navigator.clipboard.writeText(t); }
 
 setInterval(()=>{ document.getElementById('realTimeClock').textContent=new Date().toLocaleTimeString(); },1000);
 
 setInterval(async()=>{
   try{
-    const r=await fetch('/online-users');
-    const d=await r.json();
+    const r=await fetch('/online-users'); const d=await r.json();
     document.getElementById('onlineUsers').textContent=`Online: ${d.count}`;
   }catch(e){}
 },3000);
 
-['click','keydown','mousemove'].forEach(e=>{
-  document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); });
-});
+['click','keydown','mousemove'].forEach(e=>{ document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); }); });
 
 let typingTimeout;
 document.getElementById('item').addEventListener('input',()=>{
   document.getElementById('typingIndicator').style.display='block';
   clearTimeout(typingTimeout);
-  typingTimeout=setTimeout(()=>{ 
-    document.getElementById('typingIndicator').style.display='none'; 
-  },1000);
+  typingTimeout=setTimeout(()=>{ document.getElementById('typingIndicator').style.display='none'; },1000);
 });
 
 fetchWishlist();
-
 document.getElementById('addButton').onclick=addItem;
 document.getElementById('item').onkeydown=(e)=>{ if(e.key==='Enter') addItem(); };
 document.getElementById('refreshBtn').onclick=async()=>{
-  const btn=document.getElementById('refreshBtn');
-  btn.disabled=true;
-  await fetchWishlist();
-  btn.disabled=false;
+  const btn=document.getElementById('refreshBtn'); btn.disabled=true;
+  await fetchWishlist(); btn.disabled=false;
 };
 </script>
 </body>
