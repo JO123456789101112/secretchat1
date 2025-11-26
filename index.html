@@ -3,19 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>John Secret Chat💭</title>
+<title>John's Secret Chat💭</title>
 <style>
 * { box-sizing: border-box; }
 html, body { touch-action: manipulation; margin:0; padding:0; }
-
-body {
-  font-family: Arial, sans-serif;
-  background: #e5e5e5;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
+body { font-family: Arial, sans-serif; background: #e5e5e5; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
 /* HEADER */
 header {
@@ -56,8 +48,14 @@ header {
   display: flex;
   flex-direction: column-reverse;
 }
-#wishlistList { list-style:none; padding:0; margin:0; display:flex; flex-direction:column-reverse; gap:10px; }
-
+#wishlistList {
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:flex;
+  flex-direction:column-reverse;
+  gap:10px;
+}
 .bubble {
   background:white;
   padding:12px 15px;
@@ -87,55 +85,120 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
   gap:8px;
   box-shadow:0 -2px 4px rgba(0,0,0,0.15);
 }
-.input-container input[type="text"] { flex:1; padding:12px; font-size:1rem; border-radius:20px; border:1px solid #ccc; }
+.input-container input[type="text"] {
+  flex:1;
+  padding:12px;
+  font-size:1rem;
+  border-radius:20px;
+  border:1px solid #ccc;
+}
 .input-container button {
-  background:#4a90e2; color:white; padding:12px 18px;
-  border:none; font-size:1rem; border-radius:20px; cursor:pointer; flex-shrink:0;
+  background:#4a90e2;
+  color:white;
+  padding:12px 18px;
+  border:none;
+  font-size:1rem;
+  border-radius:20px;
+  cursor:pointer;
+  flex-shrink:0;
 }
 .input-container input[type="file"] { display:none; }
 .file-label {
-  font-size:22px; cursor:pointer; padding:8px; border-radius:50%;
-  background:#f2f2f2; flex-shrink:0; user-select:none;
+  font-size:22px;
+  cursor:pointer;
+  padding:8px;
+  border-radius:50%;
+  background:#f2f2f2;
+  flex-shrink:0;
+  user-select:none;
 }
 #typingIndicator { font-size:0.9rem; color:#777; padding-left:10px; margin-bottom:5px; display:none; }
 
 /* LOCK SCREEN */
 #lockScreen {
-  position: fixed; top:0; left:0;
-  width:100%; height:100%;
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
   background: linear-gradient(180deg, #4a90e2, #ffffff);
-  display:flex; flex-direction:column; justify-content:center; align-items:center;
-  z-index:9999; gap:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  gap:20px;
 }
 #pinBoxes { display:flex; gap:10px; }
 .pinBox {
-  width:45px; height:55px; text-align:center; font-size:1.8rem;
-  border-radius:10px; border:2px solid #fff; background:rgba(255,255,255,0.8);
+  width:45px;
+  height:55px;
+  text-align:center;
+  font-size:1.8rem;
+  border-radius:10px;
+  border:2px solid #fff;
+  background:rgba(255,255,255,0.8);
   box-shadow:0 2px 6px rgba(0,0,0,0.2);
 }
-#pinPad { display:grid; grid-template-columns:repeat(3,70px); gap:12px; margin-top:10px; }
+#pinPad {
+  display:grid;
+  grid-template-columns:repeat(3,70px);
+  gap:12px;
+  margin-top:10px;
+}
 .pinBtn {
-  width:70px; height:70px; font-size:1.6rem; border:none; border-radius:15px;
-  background:#fff; box-shadow:0 2px 4px rgba(0,0,0,0.3); cursor:pointer;
+  width:70px;
+  height:70px;
+  font-size:1.6rem;
+  border:none;
+  border-radius:15px;
+  background:#fff;
+  box-shadow:0 2px 4px rgba(0,0,0,0.3);
+  cursor:pointer;
 }
 .shake { animation: shakeAnim 0.3s; }
-@keyframes shakeAnim {0%{transform:translateX(0);}25%{transform:translateX(-6px);}50%{transform:translateX(6px);}75%{transform:translateX(-6px);}100%{transform:translateX(0);}}
+@keyframes shakeAnim {
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  50%{transform:translateX(6px);}
+  75%{transform:translateX(-6px);}
+  100%{transform:translateX(0);}
+}
 
 /* REFRESH */
 #refreshBtn {
-  position: fixed; top:70px; right:20px;
+  position: fixed;
+  top:70px;
+  right:20px;
   padding:10px 15px;
   background:linear-gradient(90deg, #4a90e2, #6aa8ff);
-  color:white; border:none; border-radius:10px; cursor:pointer;
-  z-index:50; font-size:1.1rem; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:0.3s;
+  color:white;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  z-index:50;
+  font-size:1.1rem;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
+  transition:0.3s;
 }
-#refreshBtn:hover{ transform:scale(1.05); box-shadow:0 4px 8px rgba(0,0,0,0.4); }
+#refreshBtn:hover{
+  transform:scale(1.05);
+  box-shadow:0 4px 8px rgba(0,0,0,0.4);
+}
 
 /* CELEBRATION */
 #welcomeMsgLeft, #welcomeMsgRight {
-  position: fixed; top:50%; transform:translateY(-50%);
-  font-size:2rem; font-weight:bold; color:white; text-shadow:0 2px 6px rgba(0,0,0,0.5);
-  opacity:0; z-index:99999; pointer-events:none; white-space:nowrap;
+  position: fixed;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:2rem;
+  font-weight:bold;
+  color:white;
+  text-shadow:0 2px 6px rgba(0,0,0,0.5);
+  opacity:0;
+  z-index:99999;
+  pointer-events:none;
+  white-space:nowrap;
 }
 #welcomeMsgLeft { left: -100%; }
 #welcomeMsgRight { right: -100%; }
@@ -143,8 +206,14 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 @keyframes slideFromRight { 0%{right:-100%;opacity:0;}50%{right:50%;opacity:1;}100%{right:-100%;opacity:0;} }
 
 .confetti-piece {
-  position: fixed; width:10px; height:10px; background:red;
-  top:0; left:50%; opacity:0.9; z-index:99998;
+  position: fixed;
+  width:10px;
+  height:10px;
+  background:red;
+  top:0;
+  left:50%;
+  opacity:0.9;
+  z-index:99998;
   animation: fall 3s linear forwards;
 }
 @keyframes fall {
@@ -183,11 +252,11 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 
 <div id="welcomeMsgLeft">Welcome Boss John!</div>
 <div id="welcomeMsgRight">Welcome Boss John!</div>
-
 <div class="real-time-clock" id="realTimeClock"></div>
 <div class="online-users" id="onlineUsers">Online: 0</div>
 
 <header>john secret chat💭</header>
+
 <div id="typingIndicator">● Someone is typing...</div>
 <button id="refreshBtn">🔄 Refresh</button>
 
@@ -232,14 +301,10 @@ document.querySelectorAll(".pinBtn").forEach(btn=>{
       if(typedPIN.length<5){ typedPIN+=val; pinBoxes[typedPIN.length-1].value="•"; }
       if(typedPIN.length===5){
         if(typedPIN===CORRECT_PIN){
-          lockScreen.style.display="none";
-          showWelcomeParty();
+          lockScreen.style.display="none"; showWelcomeParty();
         } else {
           pinBoxes.forEach(b=>b.classList.add("shake"));
-          setTimeout(()=>{
-            pinBoxes.forEach(b=>{b.value=""; b.classList.remove("shake");});
-            typedPIN="";
-          },300);
+          setTimeout(()=>{ pinBoxes.forEach(b=>{b.value=""; b.classList.remove("shake");}); typedPIN=""; },300);
         }
       }
     }
@@ -255,23 +320,12 @@ const UPLOAD_PRESET = "secret_chat_upload";
 
 function formatDate(d){ return new Date(d).toLocaleString(); }
 
-/* تحويل أي لينك في النص لعنصر <a> يفتح في تاب جديد */
-function makeLinksClickable(text) {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  return text.replace(urlRegex, function(url) {
-    return `<a href="${url}" target="_blank" style="color:#4a90e2;text-decoration:underline;">${url}</a>`;
-  });
-}
-
 function createBubble(item){
   const li=document.createElement("li");
   const bubble=document.createElement("div");
   bubble.className="bubble them";
-
-  // النص مع اللينكات
-  const safeText = makeLinksClickable(item.name || "");
-  let content=`<div>${safeText}</div>`;
-
+  let content=`<div>${item.name||""}</div>`;
+  
   if(item.imageUrl){
     content += `<img src="${item.imageUrl}"><a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
   }
@@ -279,16 +333,15 @@ function createBubble(item){
     content += `<video controls><source src="${item.videoUrl}"></video><a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
   }
   if(item.fileUrl){
-    content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>
-                <a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
+    content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br><a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
   }
-
+  
   content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
-    <div style="text-align:right;">
-      <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
-      <button onclick="deleteItem('${item._id}')">❌</button>
-    </div>`;
-
+  <div style="text-align:right;">
+    <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
+    <button onclick="deleteItem('${item._id}')">❌</button>
+  </div>`;
+  
   bubble.innerHTML = content;
   li.appendChild(bubble);
   return li;
@@ -313,48 +366,57 @@ async function uploadFile(file){
   formData.append("upload_preset",UPLOAD_PRESET);
   const uploadUrl=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
   const res=await fetch(uploadUrl,{method:"POST",body:formData});
-  const data=await res.json(); return data.secure_url;
+  const data=await res.json();
+  return data.secure_url;
 }
 
 async function addItem(){
   const input=document.getElementById('item');
   const fileInput=document.getElementById('fileInput');
   const text=input.value.trim();
-  let imageUrl=null,videoUrl=null,fileUrl=null;
-
+  let imageUrl=null, videoUrl=null, fileUrl=null;
+  
   if(fileInput.files.length>0){
-    const file=fileInput.files[0]; 
+    const file=fileInput.files[0];
     const url=await uploadFile(file);
-
     if(file.type.startsWith("image")) imageUrl=url;
     else if(file.type.startsWith("video")) videoUrl=url;
     else fileUrl=url;
   }
-
+  
   if(!text && !imageUrl && !videoUrl && !fileUrl) return;
-
+  
   await fetch('/wishlist',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})
   });
-
-  input.value=''; fileInput.value=""; fetchWishlist();
+  
+  input.value='';
+  fileInput.value="";
+  fetchWishlist();
 }
 
-async function deleteItem(id){ await fetch(`/wishlist/${id}`,{method:'DELETE'}); fetchWishlist(); }
+async function deleteItem(id){
+  await fetch(`/wishlist/${id}`,{method:'DELETE'});
+  fetchWishlist();
+}
+
 function copyText(t){ navigator.clipboard.writeText(t); }
 
 setInterval(()=>{ document.getElementById('realTimeClock').textContent=new Date().toLocaleTimeString(); },1000);
 
 setInterval(async()=>{
   try{
-    const r=await fetch('/online-users'); const d=await r.json();
+    const r=await fetch('/online-users');
+    const d=await r.json();
     document.getElementById('onlineUsers').textContent=`Online: ${d.count}`;
   }catch(e){}
 },3000);
 
-['click','keydown','mousemove'].forEach(e=>{ document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); }); });
+['click','keydown','mousemove'].forEach(e=>{
+  document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); });
+});
 
 let typingTimeout;
 document.getElementById('item').addEventListener('input',()=>{
@@ -367,8 +429,10 @@ fetchWishlist();
 document.getElementById('addButton').onclick=addItem;
 document.getElementById('item').onkeydown=(e)=>{ if(e.key==='Enter') addItem(); };
 document.getElementById('refreshBtn').onclick=async()=>{
-  const btn=document.getElementById('refreshBtn'); btn.disabled=true;
-  await fetchWishlist(); btn.disabled=false;
+  const btn=document.getElementById('refreshBtn');
+  btn.disabled=true;
+  await fetchWishlist();
+  btn.disabled=false;
 };
 </script>
 </body>
