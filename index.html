@@ -137,8 +137,8 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
   font-size:2rem; font-weight:bold; color:white; text-shadow:0 2px 6px rgba(0,0,0,0.5);
   opacity:0; z-index:99999; pointer-events:none; white-space:nowrap;
 }
-#welcomeMsgLeft { left: -100%; }
-#welcomeMsgRight { right: -100%; }
+#welcomeMsgLeft { left:-100%; }
+#welcomeMsgRight { right:-100%; }
 @keyframes slideFromLeft { 0%{left:-100%;opacity:0;}50%{left:50%;opacity:1;}100%{left:-100%;opacity:0;} }
 @keyframes slideFromRight { 0%{right:-100%;opacity:0;}50%{right:50%;opacity:1;}100%{right:-100%;opacity:0;} }
 
@@ -246,6 +246,16 @@ document.querySelectorAll(".pinBtn").forEach(btn=>{
 document.getElementById("pinDelete").onclick=()=>{ if(typedPIN.length>0){ typedPIN=typedPIN.slice(0,-1); pinBoxes[typedPIN.length].value=""; } };
 document.getElementById("welBoss").onclick = ()=>{ showWelcomeParty(); };
 
+/* MAKE LINKS CLICKABLE */
+function makeLinksClickable(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  return text.replace(urlRegex, function(url) {
+    if (url.startsWith("blob:")) return url; // ignore blob URLs
+    return `<a href="${url}" target="_blank" style="color:#4a90e2;text-decoration:underline;">${url}</a>`;
+  });
+}
+
 /* CHAT FUNCTIONS */
 const CLOUD_NAME = "drokorpop";
 const UPLOAD_PRESET = "secret_chat_upload";
@@ -256,16 +266,22 @@ function createBubble(item){
   const li=document.createElement("li");
   const bubble=document.createElement("div");
   bubble.className="bubble them";
-  let content=`<div>${item.name||""}</div>`;
+
+  let safeText = makeLinksClickable(item.name || "");
+
+  let content=`<div>${safeText}</div>`;
 
   if(item.imageUrl){
-    content += `<img src="${item.imageUrl}"><a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
+    content += `<img src="${item.imageUrl}">
+                <a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
   }
+
   if(item.videoUrl){
-    content += `<video controls><source src="${item.videoUrl}"></video><a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
+    content += `<video controls><source src="${item.videoUrl}"></video>
+                <a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
   }
+
   if(item.fileUrl){
-    // الحل للملفات العادية: remove ?fl_attachment و استخدم download فقط
     content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>
                 <a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
   }
