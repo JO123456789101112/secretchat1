@@ -3,31 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>John Secret Chat💭</title>
+<title>John's Secret Chat💭</title>
 <style>
 * { box-sizing: border-box; }
 html, body { touch-action: manipulation; margin:0; padding:0; }
 body { font-family: Arial, sans-serif; background: #e5e5e5; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-
 /* HEADER */
 header { background: linear-gradient(90deg, #4a90e2, #6aa8ff); color: #fff; text-align: center; padding: 15px; font-size: 1.8rem; position: fixed; top: 0; width: 100%; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-
 /* REAL TIME INFO */
 .real-time-clock, .online-users { position: fixed; top: 15px; padding: 5px 10px; font-size: 1rem; color: white; background-color: rgba(0,0,0,0.3); border-radius: 10px; z-index: 20; }
 .real-time-clock { left: 15px; }
 .online-users { right: 15px; }
-
 /* CHAT AREA */
 .chat-area { flex: 1; margin-top: 60px; margin-bottom: 80px; padding: 10px; overflow-y: auto; background: #f2f2f2; display: flex; flex-direction: column-reverse; }
 #wishlistList { list-style:none; padding:0; margin:0; display:flex; flex-direction:column-reverse; gap:10px; }
 .bubble { background:white; padding:12px 15px; border-radius:20px; max-width:80%; position:relative; animation: slideIn 0.3s; box-shadow:0 2px 4px rgba(0,0,0,0.1); display:flex; flex-direction:column; gap:5px; }
-.bubble img { max-width:150px; border-radius:15px; margin-top:5px; cursor:pointer; }
+.bubble img { max-width:150px; border-radius:15px; margin-top:5px; }
 video { max-width:200px; border-radius:15px; margin-top:5px; }
-a { color:#4a90e2; text-decoration:none; cursor:pointer; }
-
-/* ANIMATION */
 @keyframes slideIn { from {opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-
 /* INPUT */
 .input-container { position: fixed; bottom: 0; left: 0; width: 100%; background:#fff; padding:8px 10px; display:flex; align-items:center; gap:8px; box-shadow:0 -2px 4px rgba(0,0,0,0.15); }
 .input-container input[type="text"] { flex:1; padding:12px; font-size:1rem; border-radius:20px; border:1px solid #ccc; }
@@ -35,7 +28,6 @@ a { color:#4a90e2; text-decoration:none; cursor:pointer; }
 .input-container input[type="file"] { display:none; }
 .file-label { font-size:22px; cursor:pointer; padding:8px; border-radius:50%; background:#f2f2f2; flex-shrink:0; user-select:none; }
 #typingIndicator { font-size:0.9rem; color:#777; padding-left:10px; margin-bottom:5px; display:none; }
-
 /* LOCK SCREEN */
 #lockScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, #4a90e2, #ffffff); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999; gap:20px; }
 #pinBoxes { display:flex; gap:10px; }
@@ -44,11 +36,9 @@ a { color:#4a90e2; text-decoration:none; cursor:pointer; }
 .pinBtn { width:70px; height:70px; font-size:1.6rem; border:none; border-radius:15px; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,0.3); cursor:pointer; }
 .shake { animation: shakeAnim 0.3s; }
 @keyframes shakeAnim {0%{transform:translateX(0);}25%{transform:translateX(-6px);}50%{transform:translateX(6px);}75%{transform:translateX(-6px);}100%{transform:translateX(0);}}
-
 /* REFRESH */
 #refreshBtn { position: fixed; top:70px; right:20px; padding:10px 15px; background:linear-gradient(90deg, #4a90e2, #6aa8ff); color:white; border:none; border-radius:10px; cursor:pointer; z-index:50; font-size:1.1rem; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:0.3s; }
 #refreshBtn:hover{ transform:scale(1.05); box-shadow:0 4px 8px rgba(0,0,0,0.4); }
-
 /* CELEBRATION */
 #welcomeMsgLeft, #welcomeMsgRight { position: fixed; top:50%; transform:translateY(-50%); font-size:2rem; font-weight:bold; color:white; text-shadow:0 2px 6px rgba(0,0,0,0.5); opacity:0; z-index:99999; pointer-events:none; white-space:nowrap; }
 #welcomeMsgLeft { left: -100%; }
@@ -60,50 +50,46 @@ a { color:#4a90e2; text-decoration:none; cursor:pointer; }
 </style>
 </head>
 <body>
-
 <!-- LOCK SCREEN -->
 <div id="lockScreen">
-  <h2 style="color:white; text-shadow:0 2px 4px rgba(0,0,0,0.3);">Enter PIN to Access Chat</h2>
-  <div id="pinBoxes">
-    <input class="pinBox" disabled>
-    <input class="pinBox" disabled>
-    <input class="pinBox" disabled>
-    <input class="pinBox" disabled>
-    <input class="pinBox" disabled>
-  </div>
-  <div id="pinPad">
-    <button class="pinBtn">1</button>
-    <button class="pinBtn">2</button>
-    <button class="pinBtn">3</button>
-    <button class="pinBtn">4</button>
-    <button class="pinBtn">5</button>
-    <button class="pinBtn">6</button>
-    <button class="pinBtn">7</button>
-    <button class="pinBtn">8</button>
-    <button class="pinBtn">9</button>
-    <button class="pinBtn" id="welBoss">👑</button>
-    <button class="pinBtn">0</button>
-    <button class="pinBtn" id="pinDelete">⌫</button>
-  </div>
+<h2 style="color:white; text-shadow:0 2px 4px rgba(0,0,0,0.3);">Enter PIN to Access Chat</h2>
+<div id="pinBoxes">
+<input class="pinBox" disabled>
+<input class="pinBox" disabled>
+<input class="pinBox" disabled>
+<input class="pinBox" disabled>
+<input class="pinBox" disabled>
+</div>
+<div id="pinPad">
+<button class="pinBtn">1</button>
+<button class="pinBtn">2</button>
+<button class="pinBtn">3</button>
+<button class="pinBtn">4</button>
+<button class="pinBtn">5</button>
+<button class="pinBtn">6</button>
+<button class="pinBtn">7</button>
+<button class="pinBtn">8</button>
+<button class="pinBtn">9</button>
+<button class="pinBtn" id="welBoss">👑</button>
+<button class="pinBtn">0</button>
+<button class="pinBtn" id="pinDelete">⌫</button>
+</div>
 </div>
 
 <div id="welcomeMsgLeft">Welcome Boss John!</div>
 <div id="welcomeMsgRight">Welcome Boss John!</div>
-
 <div class="real-time-clock" id="realTimeClock"></div>
 <div class="online-users" id="onlineUsers">Online: 0</div>
 <header>john secret chat💭</header>
 <div id="typingIndicator">● Someone is typing...</div>
 <button id="refreshBtn">🔄 Refresh</button>
-
 <div class="chat-area" id="wishlist">
-  <ul id="wishlistList"></ul>
+<ul id="wishlistList"></ul>
 </div>
-
 <div class="input-container">
-  <label class="file-label">📎<input type="file" id="fileInput"></label>
-  <input type="text" id="item" placeholder="Type your message...">
-  <button id="addButton">Send</button>
+<label class="file-label">📎<input type="file" id="fileInput"></label>
+<input type="text" id="item" placeholder="Type your message...">
+<button id="addButton">Send</button>
 </div>
 
 <script>
@@ -112,34 +98,34 @@ const CORRECT_PIN="10110";
 let typedPIN="";
 const pinBoxes=document.querySelectorAll(".pinBox");
 const lockScreen=document.getElementById("lockScreen");
-
 function showWelcomeParty() {
-  const left = document.getElementById("welcomeMsgLeft");
-  const right = document.getElementById("welcomeMsgRight");
-  left.style.animation="slideFromLeft 3s forwards";
-  right.style.animation="slideFromRight 3s forwards";
-  for(let i=0;i<50;i++){
-    const conf=document.createElement("div");
-    conf.className="confetti-piece";
-    conf.style.left=Math.random()*window.innerWidth+"px";
-    conf.style.background=["red","#ff4d4d","#ff0000"][Math.floor(Math.random()*3)];
-    conf.style.animationDuration=2+Math.random()*1+"s";
-    document.body.appendChild(conf);
-    setTimeout(()=>conf.remove(),3000);
-  }
-}
-
-document.querySelectorAll(".pinBtn").forEach(btn=>{
-  btn.onclick=()=>{
-    const val=btn.textContent;
-    if(/\d/.test(val)){
-      if(typedPIN.length<5){ typedPIN+=val; pinBoxes[typedPIN.length-1].value="•"; }
-      if(typedPIN.length===5){
-        if(typedPIN===CORRECT_PIN){ lockScreen.style.display="none"; showWelcomeParty(); }
-        else { pinBoxes.forEach(b=>b.classList.add("shake")); setTimeout(()=>{ pinBoxes.forEach(b=>{b.value=""; b.classList.remove("shake");}); typedPIN=""; },300); }
-      }
+    const left = document.getElementById("welcomeMsgLeft");
+    const right = document.getElementById("welcomeMsgRight");
+    left.style.animation="slideFromLeft 3s forwards";
+    right.style.animation="slideFromRight 3s forwards";
+    for(let i=0;i<50;i++){
+        const conf=document.createElement("div");
+        conf.className="confetti-piece";
+        conf.style.left=Math.random()*window.innerWidth+"px";
+        conf.style.background=["red","#ff4d4d","#ff0000"][Math.floor(Math.random()*3)];
+        conf.style.animationDuration=2+Math.random()*1+"s";
+        document.body.appendChild(conf);
+        setTimeout(()=>conf.remove(),3000);
     }
-  };
+}
+document.querySelectorAll(".pinBtn").forEach(btn=>{
+    btn.onclick=()=>{
+        const val=btn.textContent;
+        if(/\d/.test(val)){
+            if(typedPIN.length<5){ typedPIN+=val; pinBoxes[typedPIN.length-1].value="•"; }
+            if(typedPIN.length===5){
+                if(typedPIN===CORRECT_PIN){ lockScreen.style.display="none"; showWelcomeParty(); }
+                else{ pinBoxes.forEach(b=>b.classList.add("shake"));
+                    setTimeout(()=>{ pinBoxes.forEach(b=>{b.value=""; b.classList.remove("shake");}); typedPIN=""; },300);
+                }
+            }
+        }
+    };
 });
 document.getElementById("pinDelete").onclick=()=>{ if(typedPIN.length>0){ typedPIN=typedPIN.slice(0,-1); pinBoxes[typedPIN.length].value=""; } };
 document.getElementById("welBoss").onclick = ()=>{ showWelcomeParty(); };
@@ -150,132 +136,115 @@ const UPLOAD_PRESET = "secret_chat_upload";
 
 function formatDate(d){ return new Date(d).toLocaleString(); }
 
-// تحميل مباشر لأي ملف
-function forceDownload(url, filename) {
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename || 'file';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-// فتح أي رابط في تاب جديد
-function openInNewTab(url) {
-  window.open(url, "_blank");
+// يحول أي رابط في النص إلى رابط يفتح تاب جديد
+function linkify(text) {
+    const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    return text.replace(urlPattern, function(url) {
+        return `<a href="${url}" target="_blank">${url}</a>`;
+    });
 }
 
 function createBubble(item){
-  const li=document.createElement("li");
-  const bubble=document.createElement("div");
-  bubble.className="bubble them";
-  let content=`<div>${item.name||""}</div>`;
+    const li=document.createElement("li");
+    const bubble=document.createElement("div");
+    bubble.className="bubble them";
+    let content=`<div>${linkify(item.name||"")}</div>`;
+    
+    if(item.imageUrl){
+        content += `<img src="${item.imageUrl}"><br>
+        <a href="${item.imageUrl}" download style="color:#4a90e2;" target="_blank">⬇️ Download Image</a>`;
+    }
+    if(item.videoUrl){
+        content += `<video controls><source src="${item.videoUrl}"></video><br>
+        <a href="${item.videoUrl}" download style="color:#4a90e2;" target="_blank">⬇️ Download Video</a>`;
+    }
+    if(item.fileUrl){
+        content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>
+        <a href="${item.fileUrl}" download style="color:#4a90e2;" target="_blank">⬇️ Download File</a>`;
+    }
 
-  if(item.imageUrl){
-    const downloadUrl = item.imageUrl.replace("/upload/", "/upload/fl_attachment/");
-    content += `<img src="${item.imageUrl}" onclick="openInNewTab('${item.imageUrl}')">
-                <a href="${downloadUrl}" onclick="forceDownload('${downloadUrl}','image.jpg'); return false;">⬇️ Download Image</a>`;
-  }
-
-  if(item.videoUrl){
-    const downloadUrl = item.videoUrl;
-    content += `<video controls>
-                  <source src="${item.videoUrl}">
-                </video>
-                <a href="${downloadUrl}" onclick="forceDownload('${downloadUrl}','video.mp4'); return false;">⬇️ Download Video</a>`;
-  }
-
-  if(item.fileUrl){
-    const downloadUrl = item.fileUrl;
-    content += `<a href="${downloadUrl}" target="_blank">📄 Open File</a><br>
-                <a href="${downloadUrl}" onclick="forceDownload('${downloadUrl}','file'); return false;">⬇️ Download File</a>`;
-  }
-
-  content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
-              <div style="text-align:right;">
-                <button onclick="navigator.clipboard.writeText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
-                <button onclick="deleteItem('${item._id}')">❌</button>
-              </div>`;
-  bubble.innerHTML = content;
-  li.appendChild(bubble);
-  return li;
+    content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
+    <div style="text-align:right;">
+        <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
+        <button onclick="deleteItem('${item._id}')">❌</button>
+    </div>`;
+    bubble.innerHTML = content;
+    li.appendChild(bubble);
+    return li;
 }
 
 function noScrollDown(){ document.querySelector(".chat-area").scrollTo({ top:0, behavior:'smooth'}); }
 
 async function fetchWishlist(){
-  try{
-    const res=await fetch('/wishlist');
-    const data=await res.json();
-    const list=document.getElementById('wishlistList');
-    list.innerHTML='';
-    data.forEach(msg=>list.appendChild(createBubble(msg)));
-    noScrollDown();
-  }catch(e){ console.error(e); }
+    try{
+        const res=await fetch('/wishlist');
+        const data=await res.json();
+        const list=document.getElementById('wishlistList');
+        list.innerHTML='';
+        data.forEach(msg=>list.appendChild(createBubble(msg)));
+        noScrollDown();
+    }catch(e){ console.error(e); }
 }
 
 async function uploadFile(file){
-  const formData=new FormData();
-  formData.append("file",file);
-  formData.append("upload_preset",UPLOAD_PRESET);
-  const uploadUrl=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
-  const res=await fetch(uploadUrl,{method:"POST",body:formData});
-  const data=await res.json();
-  return data.secure_url;
+    const formData=new FormData();
+    formData.append("file",file);
+    formData.append("upload_preset",UPLOAD_PRESET);
+    const uploadUrl=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
+    const res=await fetch(uploadUrl,{method:"POST",body:formData});
+    const data=await res.json();
+    return data.secure_url;
 }
 
 async function addItem(){
-  const input=document.getElementById('item');
-  const fileInput=document.getElementById('fileInput');
-  const text=input.value.trim();
-  let imageUrl=null,videoUrl=null,fileUrl=null;
-
-  if(fileInput.files.length>0){
-    const file=fileInput.files[0];
-    const url=await uploadFile(file);
-    if(file.type.startsWith("image")) imageUrl=url;
-    else if(file.type.startsWith("video")) videoUrl=url;
-    else fileUrl=url;
-  }
-
-  if(!text && !imageUrl && !videoUrl && !fileUrl) return;
-
-  await fetch('/wishlist',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})
-  });
-
-  input.value=''; fileInput.value="";
-  fetchWishlist();
+    const input=document.getElementById('item');
+    const fileInput=document.getElementById('fileInput');
+    const text=input.value.trim();
+    let imageUrl=null,videoUrl=null,fileUrl=null;
+    if(fileInput.files.length>0){
+        const file=fileInput.files[0];
+        const url=await uploadFile(file);
+        if(file.type.startsWith("image")) imageUrl=url;
+        else if(file.type.startsWith("video")) videoUrl=url;
+        else fileUrl=url;
+    }
+    if(!text && !imageUrl && !videoUrl && !fileUrl) return;
+    await fetch('/wishlist',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})
+    });
+    input.value=''; fileInput.value="";
+    fetchWishlist();
 }
 
 async function deleteItem(id){ await fetch(`/wishlist/${id}`,{method:'DELETE'}); fetchWishlist(); }
+function copyText(t){ navigator.clipboard.writeText(t); }
 
 setInterval(()=>{ document.getElementById('realTimeClock').textContent=new Date().toLocaleTimeString(); },1000);
 setInterval(async()=>{
-  try{ const r=await fetch('/online-users'); const d=await r.json(); document.getElementById('onlineUsers').textContent=`Online: ${d.count}`; }catch(e){}
+    try{
+        const r=await fetch('/online-users');
+        const d=await r.json();
+        document.getElementById('onlineUsers').textContent=`Online: ${d.count}`;
+    }catch(e){}
 },3000);
 
-['click','keydown','mousemove'].forEach(e=>{
-  document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); });
-});
+['click','keydown','mousemove'].forEach(e=>{ document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); }); });
 
 let typingTimeout;
 document.getElementById('item').addEventListener('input',()=>{
-  document.getElementById('typingIndicator').style.display='block';
-  clearTimeout(typingTimeout);
-  typingTimeout=setTimeout(()=>{ document.getElementById('typingIndicator').style.display='none'; },1000);
+    document.getElementById('typingIndicator').style.display='block';
+    clearTimeout(typingTimeout);
+    typingTimeout=setTimeout(()=>{ document.getElementById('typingIndicator').style.display='none'; },1000);
 });
 
 fetchWishlist();
 document.getElementById('addButton').onclick=addItem;
 document.getElementById('item').onkeydown=(e)=>{ if(e.key==='Enter') addItem(); };
 document.getElementById('refreshBtn').onclick=async()=>{
-  const btn=document.getElementById('refreshBtn');
-  btn.disabled=true;
-  await fetchWishlist();
-  btn.disabled=false;
+    const btn=document.getElementById('refreshBtn'); btn.disabled=true;
+    await fetchWishlist(); btn.disabled=false;
 };
 </script>
 </body>
