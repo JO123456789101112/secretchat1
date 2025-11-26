@@ -243,10 +243,7 @@ document.querySelectorAll(".pinBtn").forEach(btn=>{
   };
 });
 
-document.getElementById("pinDelete").onclick=()=>{
-  if(typedPIN.length>0){ typedPIN=typedPIN.slice(0,-1); pinBoxes[typedPIN.length].value=""; }
-};
-
+document.getElementById("pinDelete").onclick=()=>{ if(typedPIN.length>0){ typedPIN=typedPIN.slice(0,-1); pinBoxes[typedPIN.length].value=""; } };
 document.getElementById("welBoss").onclick = ()=>{ showWelcomeParty(); };
 
 /* ===================== CHAT FUNCTIONS ===================== */
@@ -264,35 +261,27 @@ function createBubble(item){
 
   /* ==== IMAGE WITH DOWNLOAD BUTTON ==== */
   if(item.imageUrl){
-    content += `
-      <img src="${item.imageUrl}">
-      <a href="${item.imageUrl}?fl_attachment" download style="color:#4a90e2;">⬇️ Download Image</a>
-    `;
+    const downloadImgUrl = item.imageUrl.replace('/upload/', '/upload/fl_attachment:download/');
+    content += `<img src="${item.imageUrl}"><a href="${downloadImgUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
   }
 
   /* ==== VIDEO WITH DOWNLOAD BUTTON ==== */
   if(item.videoUrl){
-    content += `
-      <video controls><source src="${item.videoUrl}"></video>
-      <a href="${item.videoUrl}?fl_attachment" download style="color:#4a90e2;">⬇️ Download Video</a>
-    `;
+    const downloadVideoUrl = item.videoUrl.replace('/upload/', '/upload/fl_attachment:download/');
+    content += `<video controls><source src="${item.videoUrl}"></video><a href="${downloadVideoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
   }
 
   /* ==== FILE WITH OPEN + DOWNLOAD ==== */
   if(item.fileUrl){
-    content += `
-      <a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>
-      <a href="${item.fileUrl}?fl_attachment" download style="color:#4a90e2;">⬇️ Download File</a>
-    `;
+    const downloadFileUrl = item.fileUrl.replace('/upload/', '/upload/fl_attachment:download/');
+    content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br><a href="${downloadFileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
   }
 
-  content += `
-    <small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
+  content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
     <div style="text-align:right;">
       <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
       <button onclick="deleteItem('${item._id}')">❌</button>
-    </div>
-  `;
+    </div>`;
 
   bubble.innerHTML = content;
   li.appendChild(bubble);
@@ -318,7 +307,8 @@ async function uploadFile(file){
   formData.append("upload_preset",UPLOAD_PRESET);
   const uploadUrl=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
   const res=await fetch(uploadUrl,{method:"POST",body:formData});
-  const data=await res.json(); return data.secure_url;
+  const data=await res.json(); 
+  return data.secure_url;
 }
 
 async function addItem(){
@@ -330,7 +320,6 @@ async function addItem(){
   if(fileInput.files.length>0){
     const file=fileInput.files[0]; 
     const url=await uploadFile(file);
-
     if(file.type.startsWith("image")) imageUrl=url;
     else if(file.type.startsWith("video")) videoUrl=url;
     else fileUrl=url;
@@ -385,11 +374,7 @@ document.getElementById('item').addEventListener('input',()=>{
 fetchWishlist();
 
 document.getElementById('addButton').onclick=addItem;
-
-document.getElementById('item').onkeydown=(e)=>{
-  if(e.key==='Enter') addItem();
-};
-
+document.getElementById('item').onkeydown=(e)=>{ if(e.key==='Enter') addItem(); };
 document.getElementById('refreshBtn').onclick=async()=>{
   const btn=document.getElementById('refreshBtn');
   btn.disabled=true;
