@@ -144,6 +144,23 @@ function linkify(text) {
     });
 }
 
+// تنزيل أي رابط حتى لو من Cloudinary
+function downloadUrl(url, filename="file") {
+    fetch(url)
+        .then(res => res.blob())
+        .then(blob => {
+            const a = document.createElement('a');
+            const objectUrl = URL.createObjectURL(blob);
+            a.href = objectUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(objectUrl);
+        })
+        .catch(err=>console.error(err));
+}
+
 function createBubble(item){
     const li=document.createElement("li");
     const bubble=document.createElement("div");
@@ -151,23 +168,31 @@ function createBubble(item){
     let content=`<div>${linkify(item.name||"")}</div>`;
     
     if(item.imageUrl){
-        content += `<img src="${item.imageUrl}"><br>
-        <a href="${item.imageUrl}" download style="color:#4a90e2;" target="_blank">⬇️ Download Image</a>`;
+        content += `<img src="${item.imageUrl}"><br>`;
     }
     if(item.videoUrl){
-        content += `<video controls><source src="${item.videoUrl}"></video><br>
-        <a href="${item.videoUrl}" download style="color:#4a90e2;" target="_blank">⬇️ Download Video</a>`;
+        content += `<video controls><source src="${item.videoUrl}"></video><br>`;
     }
     if(item.fileUrl){
-        content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>
-        <a href="${item.fileUrl}" download style="color:#4a90e2;" target="_blank">⬇️ Download File</a>`;
+        content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>`;
     }
 
     content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
     <div style="text-align:right;">
         <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
-        <button onclick="deleteItem('${item._id}')">❌</button>
-    </div>`;
+        <button onclick="deleteItem('${item._id}')">❌</button>`;
+
+    if(item.imageUrl){
+        content += `<button onclick="downloadUrl('${item.imageUrl}','image.jpg')">⬇️</button>`;
+    }
+    if(item.videoUrl){
+        content += `<button onclick="downloadUrl('${item.videoUrl}','video.mp4')">⬇️</button>`;
+    }
+    if(item.fileUrl){
+        content += `<button onclick="downloadUrl('${item.fileUrl}','file')">⬇️</button>`;
+    }
+
+    content += `</div>`;
     bubble.innerHTML = content;
     li.appendChild(bubble);
     return li;
