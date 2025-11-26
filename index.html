@@ -202,6 +202,16 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 </div>
 
 <script>
+
+/*************  🔥 AUTO-DETECT LINKS & MAKE CLICKABLE  *************/
+function makeLinksClickable(text) {
+  if (!text) return "";
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.replace(urlRegex, (url) =>
+    `<a href="${url}" target="_blank" style="color:#4a90e2;text-decoration:underline;">${url}</a>`
+  );
+}
+
 /* PIN SYSTEM */
 const CORRECT_PIN="10110";
 let typedPIN="";
@@ -256,21 +266,27 @@ function createBubble(item){
   const li=document.createElement("li");
   const bubble=document.createElement("div");
   bubble.className="bubble them";
-  let content=`<div>${item.name||""}</div>`;
+
+  let content = `<div>${makeLinksClickable(item.name || "")}</div>`;
 
   if(item.imageUrl){
-    content += `<img src="${item.imageUrl}"><a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`;
+    content += `
+      <img src="${item.imageUrl}">
+      <a href="${item.imageUrl}?fl_attachment" download style="color:#4a90e2;">⬇️ Download Image</a>`;
   }
   if(item.videoUrl){
-    content += `<video controls><source src="${item.videoUrl}"></video><a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`;
+    content += `
+      <video controls><source src="${item.videoUrl}"></video>
+      <a href="${item.videoUrl}?fl_attachment" download style="color:#4a90e2;">⬇️ Download Video</a>`;
   }
   if(item.fileUrl){
-    // الحل للملفات العادية: remove ?fl_attachment و استخدم download فقط
-    content += `<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>
-                <a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`;
+    content += `
+      <a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>
+      <a href="${item.fileUrl}?fl_attachment" download style="color:#4a90e2;">⬇️ Download File</a>`;
   }
 
-  content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
+  content += `
+    <small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
     <div style="text-align:right;">
       <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
       <button onclick="deleteItem('${item._id}')">❌</button>
@@ -298,9 +314,12 @@ async function uploadFile(file){
   const formData=new FormData();
   formData.append("file",file);
   formData.append("upload_preset",UPLOAD_PRESET);
+
   const uploadUrl=`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
+
   const res=await fetch(uploadUrl,{method:"POST",body:formData});
-  const data=await res.json(); return data.secure_url;
+  const data=await res.json();
+  return data.secure_url;
 }
 
 async function addItem(){
