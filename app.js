@@ -50,9 +50,12 @@ app.get('/online-users', (req, res) => {
 // ====== Wishlist Schema ======
 const wishlistSchema = new mongoose.Schema({
   name: String,
-  imageUrl: String, // رابط الصورة من Cloudinary
+  imageUrl: String,
+  videoUrl: String,
+  fileUrl: String,
   createdAt: { type: Date, default: Date.now }
 });
+
 
 const Wishlist = mongoose.model('Wishlist', wishlistSchema);
 
@@ -71,9 +74,16 @@ app.get('/wishlist', async (req, res) => {
 // POST new item with optional image
 app.post('/wishlist', async (req, res) => {
   try {
-    const { name, imageUrl } = req.body;
+const { name, imageUrl, videoUrl, fileUrl, createdAt } = req.body;
 
-    const newItem = new Wishlist({ name, imageUrl });
+const newItem = new Wishlist({
+  name,
+  imageUrl,
+  videoUrl,
+  fileUrl,
+  createdAt
+});
+
     await newItem.save();
 
     res.json(newItem);
