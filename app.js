@@ -7,7 +7,7 @@ const path = require('path');
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json()); // لا داعي للـ 10mb لأننا مش هنرفع Base64
+app.use(bodyParser.json());
 
 // ====== MongoDB Connection ======
 const dbURI = "mongodb+srv://john:john@john.gevwwjw.mongodb.net/wishList?retryWrites=true&w=majority&appName=john";
@@ -17,7 +17,7 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 // ====== Online Users Tracking ======
 const activeUsers = new Map();
-const USER_TIMEOUT = 30000; // 30 ثانية
+const USER_TIMEOUT = 30000;
 
 setInterval(() => {
   const now = Date.now();
@@ -29,7 +29,7 @@ setInterval(() => {
 }, 10000);
 
 // ====== Serve Frontend ======
-app.use(express.static(path.join(__dirname))); // لخدمة ملفات html و js
+app.use(express.static(path.join(__dirname)));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
@@ -51,11 +51,10 @@ app.get('/online-users', (req, res) => {
 const wishlistSchema = new mongoose.Schema({
   name: String,
   imageUrl: String,
-  videoUrl: String,
-  fileUrl: String,
+  videoUrl: String,   // ⬅ تمت إضافته
+  fileUrl: String,    // ⬅ تمت إضافته
   createdAt: { type: Date, default: Date.now }
 });
-
 
 const Wishlist = mongoose.model('Wishlist', wishlistSchema);
 
@@ -71,19 +70,12 @@ app.get('/wishlist', async (req, res) => {
   }
 });
 
-// POST new item with optional image
+// POST new item (image, video, file)
 app.post('/wishlist', async (req, res) => {
   try {
-const { name, imageUrl, videoUrl, fileUrl, createdAt } = req.body;
+    const { name, imageUrl, videoUrl, fileUrl } = req.body;
 
-const newItem = new Wishlist({
-  name,
-  imageUrl,
-  videoUrl,
-  fileUrl,
-  createdAt
-});
-
+    const newItem = new Wishlist({ name, imageUrl, videoUrl, fileUrl });
     await newItem.save();
 
     res.json(newItem);
@@ -93,8 +85,7 @@ const newItem = new Wishlist({
   }
 });
 
-
-// DELETE item by id
+// DELETE item
 app.delete('/wishlist/:id', async (req, res) => {
   try {
     await Wishlist.findByIdAndDelete(req.params.id);
