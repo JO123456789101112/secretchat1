@@ -209,13 +209,11 @@ const pinBoxes=document.querySelectorAll(".pinBox");
 const lockScreen=document.getElementById("lockScreen");
 
 function showWelcomeParty() {
-  // Show welcome messages
   const left = document.getElementById("welcomeMsgLeft");
   const right = document.getElementById("welcomeMsgRight");
   left.style.animation="slideFromLeft 3s forwards";
   right.style.animation="slideFromRight 3s forwards";
 
-  // Confetti
   for(let i=0;i<50;i++){
     const conf=document.createElement("div");
     conf.className="confetti-piece";
@@ -235,7 +233,7 @@ document.querySelectorAll(".pinBtn").forEach(btn=>{
       if(typedPIN.length===5){
         if(typedPIN===CORRECT_PIN){
           lockScreen.style.display="none";
-          showWelcomeParty(); // Automatically show party when PIN is correct
+          showWelcomeParty();
         } else {
           pinBoxes.forEach(b=>b.classList.add("shake"));
           setTimeout(()=>{ pinBoxes.forEach(b=>{b.value=""; b.classList.remove("shake");}); typedPIN=""; },300);
@@ -256,30 +254,64 @@ const CLOUD_NAME = "drokorpop";
 const UPLOAD_PRESET = "secret_chat_upload";
 
 function formatDate(d){ return new Date(d).toLocaleString(); }
+
 function createBubble(item){
   const li=document.createElement("li");
   const bubble=document.createElement("div");
   bubble.className="bubble them";
+
   let content=`<div>${item.name||""}</div>`;
-  if(item.imageUrl){ content+=`<img src="${item.imageUrl}"><a href="${item.imageUrl}" download style="color:#4a90e2;">⬇️ Download Image</a>`; }
-  if(item.videoUrl){ content+=`<video controls><source src="${item.videoUrl}"></video><a href="${item.videoUrl}" download style="color:#4a90e2;">⬇️ Download Video</a>`; }
-  if(item.fileUrl){ content+=`<a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><a href="${item.fileUrl}" download style="color:#4a90e2;">⬇️ Download File</a>`; }
-  content+=`<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
+
+  /* ==== IMAGE WITH DOWNLOAD BUTTON ==== */
+  if(item.imageUrl){
+    content += `
+      <img src="${item.imageUrl}">
+      <a href="${item.imageUrl}?fl_attachment" download style="color:#4a90e2;">⬇️ Download Image</a>
+    `;
+  }
+
+  /* ==== VIDEO WITH DOWNLOAD BUTTON ==== */
+  if(item.videoUrl){
+    content += `
+      <video controls><source src="${item.videoUrl}"></video>
+      <a href="${item.videoUrl}?fl_attachment" download style="color:#4a90e2;">⬇️ Download Video</a>
+    `;
+  }
+
+  /* ==== FILE WITH OPEN + DOWNLOAD ==== */
+  if(item.fileUrl){
+    content += `
+      <a href="${item.fileUrl}" target="_blank" style="color:#4a90e2;">📄 Open File</a><br>
+      <a href="${item.fileUrl}?fl_attachment" download style="color:#4a90e2;">⬇️ Download File</a>
+    `;
+  }
+
+  content += `
+    <small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
     <div style="text-align:right;">
       <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
       <button onclick="deleteItem('${item._id}')">❌</button>
-    </div>`;
-  bubble.innerHTML=content; li.appendChild(bubble); return li;
+    </div>
+  `;
+
+  bubble.innerHTML = content;
+  li.appendChild(bubble);
+  return li;
 }
+
 function noScrollDown(){ document.querySelector(".chat-area").scrollTo({ top:0, behavior:'smooth'}); }
 
 async function fetchWishlist(){
-  try{ const res=await fetch('/wishlist'); const data=await res.json();
-    const list=document.getElementById('wishlistList'); list.innerHTML='';
+  try{
+    const res=await fetch('/wishlist');
+    const data=await res.json();
+    const list=document.getElementById('wishlistList');
+    list.innerHTML='';
     data.forEach(msg=>list.appendChild(createBubble(msg)));
     noScrollDown();
   }catch(e){ console.error(e); }
 }
+
 async function uploadFile(file){
   const formData=new FormData();
   formData.append("file",file);
@@ -288,37 +320,82 @@ async function uploadFile(file){
   const res=await fetch(uploadUrl,{method:"POST",body:formData});
   const data=await res.json(); return data.secure_url;
 }
+
 async function addItem(){
   const input=document.getElementById('item');
   const fileInput=document.getElementById('fileInput');
   const text=input.value.trim();
   let imageUrl=null,videoUrl=null,fileUrl=null;
+
   if(fileInput.files.length>0){
-    const file=fileInput.files[0]; const url=await uploadFile(file);
+    const file=fileInput.files[0]; 
+    const url=await uploadFile(file);
+
     if(file.type.startsWith("image")) imageUrl=url;
     else if(file.type.startsWith("video")) videoUrl=url;
     else fileUrl=url;
   }
+
   if(!text && !imageUrl && !videoUrl && !fileUrl) return;
-  await fetch('/wishlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})});
-  input.value=''; fileInput.value=""; fetchWishlist();
+
+  await fetch('/wishlist',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name:text,imageUrl,videoUrl,fileUrl,
+      createdAt:new Date().toISOString()
+    })
+  });
+
+  input.value=''; 
+  fileInput.value="";
+  fetchWishlist();
 }
-async function deleteItem(id){ await fetch(`/wishlist/${id}`,{method:'DELETE'}); fetchWishlist(); }
+
+async function deleteItem(id){
+  await fetch(`/wishlist/${id}`,{method:'DELETE'});
+  fetchWishlist();
+}
+
 function copyText(t){ navigator.clipboard.writeText(t); }
 
 setInterval(()=>{ document.getElementById('realTimeClock').textContent=new Date().toLocaleTimeString(); },1000);
-setInterval(async()=>{ try{ const r=await fetch('/online-users'); const d=await r.json(); document.getElementById('onlineUsers').textContent=`Online: ${d.count}`;}catch(e){} },3000);
-['click','keydown','mousemove'].forEach(e=>{document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); }); });
+
+setInterval(async()=>{
+  try{
+    const r=await fetch('/online-users');
+    const d=await r.json();
+    document.getElementById('onlineUsers').textContent=`Online: ${d.count}`;
+  }catch(e){}
+},3000);
+
+['click','keydown','mousemove'].forEach(e=>{
+  document.addEventListener(e,()=>{ fetch('/heartbeat',{method:'POST'}); });
+});
+
 let typingTimeout;
 document.getElementById('item').addEventListener('input',()=>{
   document.getElementById('typingIndicator').style.display='block';
   clearTimeout(typingTimeout);
-  typingTimeout=setTimeout(()=>{ document.getElementById('typingIndicator').style.display='none'; },1000);
+  typingTimeout=setTimeout(()=>{ 
+    document.getElementById('typingIndicator').style.display='none'; 
+  },1000);
 });
+
 fetchWishlist();
+
 document.getElementById('addButton').onclick=addItem;
-document.getElementById('item').onkeydown=(e)=>{ if(e.key==='Enter') addItem(); };
-document.getElementById('refreshBtn').onclick=async()=>{ const btn=document.getElementById('refreshBtn'); btn.disabled=true; await fetchWishlist(); btn.disabled=false; };
+
+document.getElementById('item').onkeydown=(e)=>{
+  if(e.key==='Enter') addItem();
+};
+
+document.getElementById('refreshBtn').onclick=async()=>{
+  const btn=document.getElementById('refreshBtn');
+  btn.disabled=true;
+  await fetchWishlist();
+  btn.disabled=false;
+};
 </script>
 </body>
 </html>
