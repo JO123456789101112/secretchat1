@@ -13,16 +13,17 @@ body { font-family: Arial, sans-serif; background: #e5e5e5; display: flex; flex-
 /* HEADER */
 /* HEADER */
 header { 
-    background: rgba(0,0,0,0);
+    background: rgba(0,0,0,1); /* أسود كامل */
     color: #fff;
     text-align: center;
-    padding: 15px;
-    font-size: 1rem;
+    padding: 8px 10px; /* قلل البادينج لتصغير الارتفاع */
+    font-size: 1rem; /* قلل حجم الخط */
     width: 100%;
     position: relative;
     margin-top: 0;
-    backdrop-filter: blur(4px);
-    max-height:40px;
+    backdrop-filter: blur(4px); /* ممكن تحافظ عليه لو تحب تأثير الخلفية */
+    max-height: 30px; /* تحديد أقصى ارتفاع */
+    overflow: hidden; /* لمنع أي تجاوز للحد */
 }
 
 
