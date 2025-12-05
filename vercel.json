@@ -11,9 +11,7 @@
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "app.js"
-    }
+    { "src": "/image.jpg", "dest": "/image.jpg" },
+    { "src": "/(.*)", "dest": "app.js" }
   ]
 }
