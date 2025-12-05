@@ -29,7 +29,9 @@ setInterval(() => {
 }, 10000);
 
 // ====== Serve Frontend ======
-app.use(express.static(__dirname));
+// Serve static files from "images" folder
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
