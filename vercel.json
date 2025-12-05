@@ -1,14 +1,7 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "app.js", 
-      "use": "@vercel/node"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    }
+    { "src": "app.js", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/image.jpg", "dest": "/image.jpg" },
