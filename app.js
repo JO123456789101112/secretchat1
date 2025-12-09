@@ -29,9 +29,7 @@ setInterval(() => {
 }, 10000);
 
 // ====== Serve Frontend ======
-// Serve static files from "images" folder
 app.use('/images', express.static(path.join(__dirname, 'images')));
-
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
@@ -53,8 +51,12 @@ app.get('/online-users', (req, res) => {
 const wishlistSchema = new mongoose.Schema({
   name: String,
   imageUrl: String,
-  videoUrl: String,   // ⬅ تمت إضافته
-  fileUrl: String,    // ⬅ تمت إضافته
+  videoUrl: String,
+  fileUrl: String,
+
+  // ⭐ NEW — Highlight support
+  highlight: { type: Boolean, default: false },
+
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -72,18 +74,46 @@ app.get('/wishlist', async (req, res) => {
   }
 });
 
-// POST new item (image, video, file)
+// POST new item
 app.post('/wishlist', async (req, res) => {
   try {
-    const { name, imageUrl, videoUrl, fileUrl } = req.body;
+    const { name, imageUrl, videoUrl, fileUrl, highlight } = req.body;
 
-    const newItem = new Wishlist({ name, imageUrl, videoUrl, fileUrl });
+    const newItem = new Wishlist({
+      name,
+      imageUrl,
+      videoUrl,
+      fileUrl,
+
+      // ⭐ NEW
+      highlight: highlight || false
+    });
+
     await newItem.save();
-
     res.json(newItem);
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to add item to wishlist' });
+    res.status(500).json({ error: 'Failed to add item' });
+  }
+});
+
+// ⭐ NEW — PUT update item (for edit message)
+app.put('/wishlist/:id', async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    const updated = await Wishlist.findByIdAndUpdate(
+      req.params.id,
+      { name },
+      { new: true }
+    );
+
+    res.json(updated);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update item' });
   }
 });
 
