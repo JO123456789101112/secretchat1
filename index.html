@@ -13,19 +13,18 @@ body { font-family: Arial, sans-serif; background: #e5e5e5; display: flex; flex-
 /* HEADER */
 /* HEADER */
 header { 
-    background: rgba(0,0,0,1); /* أسود كامل */
+    background: rgba(0,0,0,1);
     color: #fff;
     text-align: center;
-    padding: 1px 10px; /* قلل البادينج لتصغير الارتفاع */
-    font-size: 1.3rem; /* قلل حجم الخط */
+    padding: 1px 10px;
+    font-size: 1.3rem;
     width: 100%;
     position: relative;
     margin-top: 0;
-    backdrop-filter: blur(4px); /* ممكن تحافظ عليه لو تحب تأثير الخلفية */
-    max-height: 30px; /* تحديد أقصى ارتفاع */
-    overflow: hidden; /* لمنع أي تجاوز للحد */
+    backdrop-filter: blur(4px);
+    max-height: 30px;
+    overflow: hidden;
 }
-
 
 .real-time-clock, .online-users { position: fixed; top: 15px; padding: 5px 10px; font-size: 1rem; color: white; background-color: rgba(0,0,0,0.3); border-radius: 10px; z-index: 20; }
 .real-time-clock { left: 15px; }
@@ -37,6 +36,15 @@ header {
 .bubble img { max-width:150px; border-radius:15px; margin-top:5px; }
 video { max-width:200px; border-radius:15px; margin-top:5px; }
 @keyframes slideIn { from {opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+/* ⭐ NEW — Highlight full-width green neon */
+.highlight-bubble {
+    background: #ccff00 !important;
+    width: 100% !important;
+    border-radius: 10px !important;
+    padding: 15px !important;
+}
+
 /* INPUT */
 .input-container { position: fixed; bottom: 0; left: 0; width: 100%; background:#fff; padding:8px 10px; display:flex; align-items:center; gap:8px; box-shadow:0 -2px 4px rgba(0,0,0,0.15); }
 .input-container input[type="text"] { flex:1; padding:12px; font-size:1rem; border-radius:20px; border:1px solid #ccc; }
@@ -44,6 +52,7 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 .input-container input[type="file"] { display:none; }
 .file-label { font-size:22px; cursor:pointer; padding:8px; border-radius:50%; background:#f2f2f2; flex-shrink:0; user-select:none; }
 #typingIndicator { font-size:0.9rem; color:#777; padding-left:10px; margin-bottom:5px; display:none; }
+
 /* LOCK SCREEN */
 #lockScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(180deg, #000000, #ffffff); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999; gap:20px; }
 #pinBoxes { display:flex; gap:10px; }
@@ -61,10 +70,12 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 #pinPad { display:grid; grid-template-columns:repeat(3,70px); gap:12px; margin-top:10px; }
 .pinBtn { width:70px; height:70px; font-size:1.6rem; border:none; border-radius:15px; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,0.3); cursor:pointer; color: #000000; }
 .shake { animation: shakeAnim 0.3s; }
-@keyframes shakeAnim {0%{transform:translateX(0);}25%{transform:translateX(-6px);}50%{transform:translateX(6px);}75%{transform:translateX(-6px);}100%{transform:translateX(0);}}
+@keyframes shakeAnim {0%{transform:translateX(0);}25%{transform:translateX(-6px);}50%{transform:translateX(6px);}75%{transform:translateX(-6px);}100%{transform:translateX(0);} }
+
 /* REFRESH */
-#refreshBtn { position: fixed; top:70px; right:20px; padding:10px 15px; background:linear-gradient(90deg, #4a90e2, #6aa8ff); color:white; border:none; border-radius:5px; cursor:pointer; z-index:50; font-size:0.7rem; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:0.3s; background: rgba(0,0,0,1); }
+#refreshBtn { position: fixed; top:70px; right:20px; padding:10px 15px; background: rgba(0,0,0,1); color:white; border:none; border-radius:5px; cursor:pointer; z-index:50; font-size:0.7rem; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:0.3s; }
 #refreshBtn:hover{ transform:scale(1.05); box-shadow:0 4px 8px rgba(0,0,0,0.4); }
+
 /* CELEBRATION */
 #welcomeMsgLeft, #welcomeMsgRight { position: fixed; top:50%; transform:translateY(-50%); font-size:2rem; font-weight:bold; color:white; text-shadow:0 2px 6px rgba(0,0,0,0.5); opacity:0; z-index:99999; pointer-events:none; white-space:nowrap; }
 #welcomeMsgLeft { left: -100%; }
@@ -109,21 +120,28 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
     
 <img src="images/image.jpg" style="width:100%; max-height:100px; margin-top:0; display:block;">
 
-    
 <header>john secret chat💭</header>
 <div id="typingIndicator">● Someone is typing...</div>
 <button id="refreshBtn">🔄 Refresh</button>
+
 <div class="chat-area" id="wishlist">
 <ul id="wishlistList"></ul>
 </div>
+
 <div class="input-container">
 <label class="file-label">📎<input type="file" id="fileInput"></label>
+
+<!-- ⭐ NEW — Highlighter button -->
+<button id="highlightBtn" style="background:#ccff00;color:#000;padding:12px 15px;border:none;border-radius:20px;cursor:pointer;">H</button>
+
 <input type="text" id="item" placeholder="Type your message...">
+
 <button id="addButton" style="background: rgba(0,0,0,1);">Send</button>
 </div>
 
 <script>
-/* PIN SYSTEM */
+
+/* PIN SYSTEM — (كما هو بدون تعديل) */
 const CORRECT_PIN="4862";
 let typedPIN="";
 const pinBoxes=document.querySelectorAll(".pinBox");
@@ -157,11 +175,9 @@ document.querySelectorAll(".pinBtn").forEach(btn=>{
         }
     };
 });
-    // ✅ السماح بكتابة PIN من الكيبورد
+
 document.addEventListener('keydown', (e) => {
     const key = e.key;
-
-    // لو رقم
     if (/^\d$/.test(key)) {
         if (typedPIN.length < 4) {
             typedPIN += key;
@@ -180,8 +196,6 @@ document.addEventListener('keydown', (e) => {
             }
         }
     }
-
-    // لو ضغط Backspace نحذف آخر رقم
     if (key === "Backspace") {
         if (typedPIN.length > 0) {
             typedPIN = typedPIN.slice(0, -1);
@@ -199,7 +213,6 @@ const UPLOAD_PRESET = "secret_chat_upload";
 
 function formatDate(d){ return new Date(d).toLocaleString(); }
 
-// يحول أي رابط في النص إلى رابط يفتح تاب جديد
 function linkify(text) {
     const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     return text.replace(urlPattern, function(url) {
@@ -207,7 +220,6 @@ function linkify(text) {
     });
 }
 
-// تنزيل أي رابط حتى لو من Cloudinary
 function downloadUrl(url, filename="file") {
     fetch(url)
         .then(res => res.blob())
@@ -224,10 +236,19 @@ function downloadUrl(url, filename="file") {
         .catch(err=>console.error(err));
 }
 
+/* ⭐ NEW — Highlighter mode */
+let highlightMode = false;
+document.getElementById("highlightBtn").onclick = () => {
+    highlightMode = !highlightMode;
+    document.getElementById("highlightBtn").style.background = highlightMode ? "#aaff00" : "#ccff00";
+};
+
+/* BUBBLES */
 function createBubble(item){
     const li=document.createElement("li");
     const bubble=document.createElement("div");
-    bubble.className="bubble them";
+    bubble.className="bubble them " + (item.highlight ? "highlight-bubble" : ""); // ⭐ NEW
+
     let content=`<div>${linkify(item.name||"")}</div>`;
     
     if(item.imageUrl){
@@ -243,7 +264,11 @@ function createBubble(item){
     content += `<small style="font-size:0.7rem;color:#666;">${formatDate(item.createdAt)}</small>
     <div style="text-align:right;">
         <button onclick="copyText('${item.name?.replace(/'/g,"&#39;")||""}')">📋</button>
-        <button onclick="deleteItem('${item._id}')">❌</button>`;
+        <button onclick="deleteItem('${item._id}')">❌</button>
+
+        <!-- ⭐ NEW — Edit button -->
+        <button onclick="editItem('${item._id}', '${item.name?.replace(/'/g,"&#39;")||""}')">✏️</button>
+    `;
 
     if(item.imageUrl){
         content += `<button onclick="downloadUrl('${item.imageUrl}','image.jpg')">⬇️</button>`;
@@ -289,6 +314,7 @@ async function addItem(){
     const fileInput=document.getElementById('fileInput');
     const text=input.value.trim();
     let imageUrl=null,videoUrl=null,fileUrl=null;
+
     if(fileInput.files.length>0){
         const file=fileInput.files[0];
         const url=await uploadFile(file);
@@ -296,17 +322,46 @@ async function addItem(){
         else if(file.type.startsWith("video")) videoUrl=url;
         else fileUrl=url;
     }
+
     if(!text && !imageUrl && !videoUrl && !fileUrl) return;
+
     await fetch('/wishlist',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({name:text,imageUrl,videoUrl,fileUrl,createdAt:new Date().toISOString()})
+        body:JSON.stringify({
+            name:text,
+            imageUrl,
+            videoUrl,
+            fileUrl,
+            highlight: highlightMode,  // ⭐ NEW
+            createdAt:new Date().toISOString()
+        })
     });
-    input.value=''; fileInput.value="";
+
+    input.value=''; 
+    fileInput.value="";
+    highlightMode = false;
+    document.getElementById("highlightBtn").style.background = "#ccff00";
+
     fetchWishlist();
 }
 
 async function deleteItem(id){ await fetch(`/wishlist/${id}`,{method:'DELETE'}); fetchWishlist(); }
+
+/* ⭐ NEW — Edit message */
+async function editItem(id, oldText) {
+    const newText = prompt("Edit your message:", oldText);
+    if (!newText || newText.trim() === oldText) return;
+
+    await fetch(`/wishlist/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ name: newText })
+    });
+
+    fetchWishlist();
+}
+
 function copyText(t){ navigator.clipboard.writeText(t); }
 
 setInterval(()=>{ document.getElementById('realTimeClock').textContent=new Date().toLocaleTimeString(); },1000);
@@ -334,6 +389,7 @@ document.getElementById('refreshBtn').onclick=async()=>{
     const btn=document.getElementById('refreshBtn'); btn.disabled=true;
     await fetchWishlist(); btn.disabled=false;
 };
+
 </script>
 </body>
 </html>
