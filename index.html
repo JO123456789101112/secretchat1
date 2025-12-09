@@ -153,11 +153,11 @@ document.addEventListener('keydown', (e) => {
 
     // لو رقم
     if (/^\d$/.test(key)) {
-        if (typedPIN.length < 5) {
+        if (typedPIN.length < 4) {
             typedPIN += key;
             pinBoxes[typedPIN.length - 1].value = "•";
         }
-        if (typedPIN.length === 5) {
+        if (typedPIN.length === 4) {
             if (typedPIN === CORRECT_PIN) {
                 lockScreen.style.display = "none";
                 showWelcomeParty();
