@@ -137,8 +137,8 @@ document.querySelectorAll(".pinBtn").forEach(btn=>{
     btn.onclick=()=>{
         const val=btn.textContent;
         if(/\d/.test(val)){
-            if(typedPIN.length<5){ typedPIN+=val; pinBoxes[typedPIN.length-1].value="•"; }
-            if(typedPIN.length===5){
+            if(typedPIN.length<4){ typedPIN+=val; pinBoxes[typedPIN.length-1].value="•"; }
+            if(typedPIN.length===4){
                 if(typedPIN===CORRECT_PIN){ lockScreen.style.display="none"; showWelcomeParty(); }
                 else{ pinBoxes.forEach(b=>b.classList.add("shake"));
                     setTimeout(()=>{ pinBoxes.forEach(b=>{b.value=""; b.classList.remove("shake");}); typedPIN=""; },300);
