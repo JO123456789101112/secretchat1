@@ -115,7 +115,7 @@ video { max-width:200px; border-radius:15px; margin-top:5px; }
 
 <script>
 /* PIN SYSTEM */
-const CORRECT_PIN="10110";
+const CORRECT_PIN="4862";
 let typedPIN="";
 const pinBoxes=document.querySelectorAll(".pinBox");
 const lockScreen=document.getElementById("lockScreen");
@@ -148,6 +148,39 @@ document.querySelectorAll(".pinBtn").forEach(btn=>{
         }
     };
 });
+    // ✅ السماح بكتابة PIN من الكيبورد
+document.addEventListener('keydown', (e) => {
+    const key = e.key;
+
+    // لو رقم
+    if (/^\d$/.test(key)) {
+        if (typedPIN.length < 5) {
+            typedPIN += key;
+            pinBoxes[typedPIN.length - 1].value = "•";
+        }
+        if (typedPIN.length === 5) {
+            if (typedPIN === CORRECT_PIN) {
+                lockScreen.style.display = "none";
+                showWelcomeParty();
+            } else {
+                pinBoxes.forEach(b => b.classList.add("shake"));
+                setTimeout(() => {
+                    pinBoxes.forEach(b => { b.value = ""; b.classList.remove("shake"); });
+                    typedPIN = "";
+                }, 300);
+            }
+        }
+    }
+
+    // لو ضغط Backspace نحذف آخر رقم
+    if (key === "Backspace") {
+        if (typedPIN.length > 0) {
+            typedPIN = typedPIN.slice(0, -1);
+            pinBoxes[typedPIN.length].value = "";
+        }
+    }
+});
+
 document.getElementById("pinDelete").onclick=()=>{ if(typedPIN.length>0){ typedPIN=typedPIN.slice(0,-1); pinBoxes[typedPIN.length].value=""; } };
 document.getElementById("welBoss").onclick = ()=>{ showWelcomeParty(); };
 
